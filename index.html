@@ -1,38 +1,21 @@
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
-    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
-
-    const firebaseConfig = {
-        apiKey: "AIzaSyA03zVPJ3InsB__d2cZHMpo_ktJoyrCXU",
-        authDomain: "vinaywrites-a4f43.firebaseapp.com",
-        projectId: "vinaywrites-a4f43",
-        storageBucket: "vinaywrites-a4f43.appspot.com",
-        messagingSenderId: "13814587804",
-        appId: "1:13814587804:web:3c461c1a42bd6c6a0ae859"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-
-    async function fetchUsers() {
+async function fetchUsers() {
         const usersListDiv = document.getElementById("users-list");
         try {
+            console.log("Fetching data...");
             const querySnapshot = await getDocs(collection(db, "Users"));
             usersListDiv.innerHTML = "<h3>Users List:</h3>";
             
             if (querySnapshot.empty) {
-                usersListDiv.innerHTML += "<p>No users found in database.</p>";
+                usersListDiv.innerHTML += "<p>Database lo emi leవు (No users found).</p>";
             } else {
                 querySnapshot.forEach((doc) => {
-                    const user = doc.data();
-                    usersListDiv.innerHTML += `<p>Name: ${user.Name || 'N/A'} | Phone: ${user.Phone || 'N/A'} | Role: ${user.Role || 'N/A'}</p>`;
+                    const data = doc.data();
+                    console.log("User data:", data); // ఇక్కడ కన్సోల్ లో డేటా కనిపిస్తుంది
+                    usersListDiv.innerHTML += `<p>Name: ${data.Name || 'N/A'}</p>`;
                 });
             }
-        } catch (error) {
-            console.error("Error details:", error);
-            usersListDiv.innerHTML = "<p>Error loading data. Check Console (F12).</p>";
+        } catch (e) {
+            console.error("Error: ", e);
+            usersListDiv.innerHTML = "<p>Error: " + e.message + "</p>";
         }
     }
-    
-    fetchUsers();
-</script>
