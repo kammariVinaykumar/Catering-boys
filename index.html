@@ -1,21 +1,43 @@
-async function fetchUsers() {
-        const usersListDiv = document.getElementById("users-list");
-        try {
-            console.log("Fetching data...");
-            const querySnapshot = await getDocs(collection(db, "Users"));
-            usersListDiv.innerHTML = "<h3>Users List:</h3>";
-            
-            if (querySnapshot.empty) {
-                usersListDiv.innerHTML += "<p>Database lo emi leవు (No users found).</p>";
-            } else {
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Catering Boys App</title>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
+        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyA03zVPJ3InsB__d2cZHMpo_ktJoyrCXU",
+            authDomain: "vinaywrites-a4f43.firebaseapp.com",
+            projectId: "vinaywrites-a4f43",
+            storageBucket: "vinaywrites-a4f43.appspot.com",
+            messagingSenderId: "13814587804",
+            appId: "1:13814587804:web:3c461c1a42bd6c6a0ae859"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        async function fetchUsers() {
+            const usersListDiv = document.getElementById("users-list");
+            try {
+                const querySnapshot = await getDocs(collection(db, "Users"));
+                usersListDiv.innerHTML = "<h3>Users List:</h3>";
                 querySnapshot.forEach((doc) => {
                     const data = doc.data();
-                    console.log("User data:", data); // ఇక్కడ కన్సోల్ లో డేటా కనిపిస్తుంది
                     usersListDiv.innerHTML += `<p>Name: ${data.Name || 'N/A'}</p>`;
                 });
+            } catch (e) {
+                usersListDiv.innerHTML = "<p>Error: " + e.message + "</p>";
             }
-        } catch (e) {
-            console.error("Error: ", e);
-            usersListDiv.innerHTML = "<p>Error: " + e.message + "</p>";
         }
-    }
+        
+        // పేజీ లోడ్ అవ్వగానే ఫంక్షన్‌ని రన్ చేస్తుంది
+        window.onload = fetchUsers;
+    </script>
+</head>
+<body>
+    <h1>Catering Boys App</h1>
+    <div id="users-list">Loading users...</div>
+</body>
+</html>
