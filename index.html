@@ -59,10 +59,8 @@
 
     const db = getFirestore(initializeApp(firebaseConfig));
 
-    // Telegram Function
     async function sendTelegramNotification(message) {
-        const BOT_TOKEN = "8781247032:AAFO15to4OwfwFUhFZGqoeLHt2mx7Z-j_dw"
-        "YOUR_NEW_BOT_TOKEN_HERE"; 
+        const BOT_TOKEN = "8781247032:AAFO15to4OwfwFUhFZGqoeLHt2mx7Z-j_dw"; 
         const CHAT_ID = "6674906122";
         const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(message)}`;
         await fetch(url);
@@ -82,18 +80,20 @@
     window.postWork = async () => {
         let type = document.getElementById('work-type').value;
         if (type === 'Others') type = document.getElementById('other-text').value;
+        const owner = document.getElementById('owner-name').value;
         const needed = parseInt(document.getElementById('needed-count').value);
+        const budget = document.getElementById('budget').value;
 
         await addDoc(collection(db, "WorkRequests"), {
-            OwnerName: document.getElementById('owner-name').value,
+            OwnerName: owner,
             Type: type,
             Needed: needed,
             BookedBy: [], 
             Location: document.getElementById('work-location').value,
-            Budget: document.getElementById('budget').value
+            Budget: budget
         });
         
-        await sendTelegramNotification(`New work posted! Type: ${type}, Needed: ${needed}`);
+        await sendTelegramNotification(`New work posted!\nOwner: ${owner}\nType: ${type}\nNeeded: ${needed}\nBudget: ${budget}`);
         alert("Work Posted Successfully!");
         showSection('main-menu');
     };
@@ -114,19 +114,23 @@
                     <p>Pay: ₹${perPerson} per head</p>
                     <p>Slots: <b>${remaining} / ${d.Needed}</b></p>
                     <a href="${d.Location}" target="_blank">View Map</a><br><br>
-                    <button onclick="confirmJob('${docSnapshot.id}', ${remaining}, ${d.Needed})">Confirm Job</button>
+                    <button onclick="confirmJob('${docSnapshot.id}')">Confirm Job</button>
                 </div>`;
             }
         });
     }
 
-    window.confirmJob = async (id, remaining, total) => {
-        await updateDoc(doc(db, "WorkRequests", id), { BookedBy: arrayUnion("Worker") });
+    window.confirmJob = async (id) => {
+        const name = prompt("Enter your Name:");
+        const phone = prompt("Enter your Phone Number:");
+        if (!name || !phone) return;
+
+        await updateDoc(doc(db, "WorkRequests", id), { 
+            BookedBy: arrayUnion({ name, phone }) 
+        });
         
-        let msg = (remaining - 1 === 0) ? "Job Full!" : `Worker joined. Remaining: ${remaining - 1}/${total}`;
-        await sendTelegramNotification(msg);
-        
-        alert("Joined successfully!");
+        await sendTelegramNotification(`New Worker Interested!\nName: ${name}\nPhone: ${phone}`);
+        alert("Details sent to Admin. Admin will contact you!");
         loadJobs();
     };
 </script>
