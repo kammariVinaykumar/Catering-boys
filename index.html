@@ -2,57 +2,51 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Catering & Services App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catering Services App</title>
     <style>
         body { font-family: sans-serif; background-color: #f4f7f6; padding: 20px; }
         .container { max-width: 500px; margin: auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         h2 { text-align: center; color: #1a73e8; }
-        input, select, button { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
+        input, select, button { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; display: block; }
         button { background-color: #1a73e8; color: white; border: none; cursor: pointer; font-size: 16px; }
-        .job-card { border: 1px solid #eee; padding: 15px; margin: 10px 0; border-radius: 8px; background: #fff; }
-        .back-btn { background-color: gray; margin-top: 10px; }
+        .job-card { border: 1px solid #ddd; padding: 15px; margin: 10px 0; border-radius: 8px; background: #fff; }
     </style>
 </head>
 <body>
 
 <div class="container" id="main-menu">
-    <h1>Welcome!</h1>
+    <h2>Welcome!</h2>
     <button onclick="showSection('owner-post')">Posting a Work</button>
-    <button onclick="showSection('worker-reg')" style="background-color: #28a745;">Looking for Work</button>
+    <button onclick="showSection('worker-dashboard')" style="background-color: #28a745;">Looking for Work</button>
 </div>
 
 <div class="container" id="owner-post" style="display:none;">
     <h2>Post New Work</h2>
-    <input type="text" id="owner-name" placeholder="Owner Name" required>
-    <input type="tel" id="owner-phone" placeholder="Phone Number" required>
-    <select id="work-type">
+    <input type="text" id="owner-name" placeholder="Owner Name">
+    <select id="work-type" onchange="toggleOther(this.value)">
         <option value="Catering">Catering</option>
         <option value="Cleaning">Cleaning</option>
         <option value="Decoration">Decoration</option>
+        <option value="Others">Others</option>
     </select>
-    <input type="url" id="work-location" placeholder="Paste Google Maps Link" required>
-    <input type="number" id="budget" placeholder="Total Amount (₹)" required>
+    <input type="text" id="other-text" placeholder="Type your work here" style="display:none;">
+    <input type="number" id="needed-count" placeholder="Workers Needed?">
+    <input type="url" id="work-location" placeholder="Google Maps Link">
+    <input type="number" id="budget" placeholder="Budget (Total)">
     <button onclick="postWork()">Submit Work</button>
-    <button class="back-btn" onclick="showSection('main-menu')">Back</button>
-</div>
-
-<div class="container" id="worker-reg" style="display:none;">
-    <h2>Worker Registration</h2>
-    <input type="text" id="w-name" placeholder="Full Name" required>
-    <input type="tel" id="w-phone" placeholder="Phone Number" required>
-    <button onclick="registerWorker()" style="background-color: #28a745;">Register & View Jobs</button>
-    <button class="back-btn" onclick="showSection('main-menu')">Back</button>
+    <button onclick="showSection('main-menu')" style="background-color: gray;">Back</button>
 </div>
 
 <div class="container" id="worker-dashboard" style="display:none;">
     <h2>Available Jobs</h2>
     <div id="job-feed"></div>
-    <button class="back-btn" onclick="showSection('main-menu')">Back to Home</button>
+    <button onclick="showSection('main-menu')" style="background-color: gray;">Back</button>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, getDocs, updateDoc, doc, arrayUnion } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyA03zVPJ3InsB__d2cZHMpo_ktJoyrCXU",
@@ -63,48 +57,78 @@
         appId: "1:13814587804:web:3c461c1a42bd6c6a0ae859"
     };
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+    const db = getFirestore(initializeApp(firebaseConfig));
+
+    // Telegram Function
+    async function sendTelegramNotification(message) {
+        const BOT_TOKEN = "8781247032:AAFO15to4OwfwFUhFZGqoeLHt2mx7Z-j_dw"
+        "YOUR_NEW_BOT_TOKEN_HERE"; 
+        const CHAT_ID = "6674906122";
+        const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(message)}`;
+        await fetch(url);
+    }
+
+    window.toggleOther = (val) => {
+        document.getElementById('other-text').style.display = (val === 'Others') ? 'block' : 'none';
+    };
 
     window.showSection = (id) => {
         document.getElementById('main-menu').style.display = (id === 'main-menu') ? 'block' : 'none';
         document.getElementById('owner-post').style.display = (id === 'owner-post') ? 'block' : 'none';
-        document.getElementById('worker-reg').style.display = (id === 'worker-reg') ? 'block' : 'none';
         document.getElementById('worker-dashboard').style.display = (id === 'worker-dashboard') ? 'block' : 'none';
         if(id === 'worker-dashboard') loadJobs();
     };
 
     window.postWork = async () => {
-        const name = document.getElementById('owner-name').value;
-        const loc = document.getElementById('work-location').value;
-        const budget = document.getElementById('budget').value;
-        if(!name || !loc || !budget) return alert("Please fill all fields!");
-        
+        let type = document.getElementById('work-type').value;
+        if (type === 'Others') type = document.getElementById('other-text').value;
+        const needed = parseInt(document.getElementById('needed-count').value);
+
         await addDoc(collection(db, "WorkRequests"), {
-            OwnerName: name, Type: document.getElementById('work-type').value,
-            Location: loc, Budget: budget
+            OwnerName: document.getElementById('owner-name').value,
+            Type: type,
+            Needed: needed,
+            BookedBy: [], 
+            Location: document.getElementById('work-location').value,
+            Budget: document.getElementById('budget').value
         });
+        
+        await sendTelegramNotification(`New work posted! Type: ${type}, Needed: ${needed}`);
         alert("Work Posted Successfully!");
         showSection('main-menu');
     };
 
-    window.registerWorker = () => { showSection('worker-dashboard'); };
-
     async function loadJobs() {
-        const feed = document.getElementById('job-feed');
         const snapshot = await getDocs(collection(db, "WorkRequests"));
+        const feed = document.getElementById('job-feed');
         feed.innerHTML = "";
-        snapshot.forEach((doc) => {
-            const d = doc.data();
-            const earnings = d.Budget * 0.9;
-            feed.innerHTML += `<div class="job-card">
-                <h4>${d.Type}</h4>
-                <p>Earnings: ₹${earnings}</p>
-                <a href="${d.Location}" target="_blank">Open Google Maps</a><br>
-                <button onclick="alert('Confirmed!')" style="background-color: #28a745; margin-top:10px;">Confirm Job</button>
-            </div>`;
+        snapshot.forEach((docSnapshot) => {
+            const d = docSnapshot.data();
+            const bookedCount = d.BookedBy ? d.BookedBy.length : 0;
+            const remaining = d.Needed - bookedCount;
+            const perPerson = ((d.Budget * 0.9) / d.Needed).toFixed(2);
+            
+            if (remaining > 0) {
+                feed.innerHTML += `<div class="job-card">
+                    <h4>Work: ${d.Type}</h4>
+                    <p>Pay: ₹${perPerson} per head</p>
+                    <p>Slots: <b>${remaining} / ${d.Needed}</b></p>
+                    <a href="${d.Location}" target="_blank">View Map</a><br><br>
+                    <button onclick="confirmJob('${docSnapshot.id}', ${remaining}, ${d.Needed})">Confirm Job</button>
+                </div>`;
+            }
         });
     }
+
+    window.confirmJob = async (id, remaining, total) => {
+        await updateDoc(doc(db, "WorkRequests", id), { BookedBy: arrayUnion("Worker") });
+        
+        let msg = (remaining - 1 === 0) ? "Job Full!" : `Worker joined. Remaining: ${remaining - 1}/${total}`;
+        await sendTelegramNotification(msg);
+        
+        alert("Joined successfully!");
+        loadJobs();
+    };
 </script>
 </body>
 </html>
