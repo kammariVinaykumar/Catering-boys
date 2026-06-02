@@ -4,6 +4,17 @@
     <title>Catering Boys App</title>
     <!-- Firebase SDK Scripts -->
     <script type="module">
+        import { collection, getDocs } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
+
+async function fetchUsers() {
+    const querySnapshot = await getDocs(collection(db, "Users"));
+    querySnapshot.forEach((doc) => {
+        console.log(doc.id, " => ", doc.data());
+    });
+}
+
+// "Get OTP" బటన్ క్లిక్ చేసినప్పుడు ఈ ఫంక్షన్ పనిచేసేలా చేయవచ్చు
+fetchUsers();
         // Firebase SDK imports
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
         import { getFirestore } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
