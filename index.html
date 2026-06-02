@@ -2,26 +2,30 @@
 <html>
 <head>
     <title>Catering Boys App</title>
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
+    <!-- Firebase SDK Scripts -->
+    <script type="module">
+        // Firebase SDK imports
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
+        import { getFirestore } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
+
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyA03zVPJ3InsB__d2cZHMpo_ktJoyrCXU",
+            authDomain: "vinaywrites-a4f43.firebaseapp.com",
+            projectId: "vinaywrites-a4f43",
+            storageBucket: "vinaywrites-a4f43.appspot.com",
+            messagingSenderId: "13814587804",
+            appId: "1:13814587804:web:3c461c1a42bd6c6a0ae859"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        console.log("Firebase Connected Successfully!");
+    </script>
 </head>
 <body>
-    <div id="login-container">
-        <h2>Welcome to Catering Boys</h2>
-        <input type="tel" id="phone" placeholder="Enter Mobile Number">
-        <button onclick="sendOTP()">Get OTP</button>
-    </div>
-
-    <script>
-        function sendOTP() {
-            const phone = document.getElementById('phone').value;
-            // Ikkada Firebase Auth logic vasthundi
-            console.log("OTP sending to: " + phone);
-        }
-        
-        // Location Access check
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(showPosition);
-        }
-    </script>
+    <h1>Catering Boys App Ready!</h1>
+    <p>Check the Console (F12) for connection status.</p>
 </body>
 </html>
