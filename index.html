@@ -18,102 +18,21 @@
             --shadow: 0 4px 24px rgba(0,0,0,0.08);
             --radius: 14px;
         }
-
         * { box-sizing: border-box; margin: 0; padding: 0; }
-
-        body {
-            font-family: 'DM Sans', sans-serif;
-            background: #f1f5f9;
-            min-height: 100vh;
-            padding: 16px;
-        }
-
-        .screen {
-            max-width: 480px;
-            margin: 0 auto;
-            display: none;
-        }
+        body { font-family: 'DM Sans', sans-serif; background: #f1f5f9; min-height: 100vh; padding: 16px; }
+        .screen { max-width: 480px; margin: 0 auto; display: none; }
         .screen.active { display: block; }
-
-        /* Header */
-        .app-header {
-            text-align: center;
-            padding: 28px 0 20px;
-        }
-        .app-logo {
-            font-family: 'Sora', sans-serif;
-            font-size: 26px;
-            font-weight: 700;
-            color: var(--primary);
-            letter-spacing: -0.5px;
-        }
+        .app-header { text-align: center; padding: 28px 0 20px; }
+        .app-logo { font-family: 'Sora', sans-serif; font-size: 26px; font-weight: 700; color: var(--primary); letter-spacing: -0.5px; }
         .app-logo span { color: #1e293b; }
-        .app-tagline {
-            font-size: 13px;
-            color: var(--gray);
-            margin-top: 4px;
-        }
-
-        /* Card */
-        .card {
-            background: var(--white);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            padding: 24px;
-            margin-bottom: 16px;
-        }
-
-        .card-title {
-            font-family: 'Sora', sans-serif;
-            font-size: 18px;
-            font-weight: 700;
-            color: #1e293b;
-            margin-bottom: 20px;
-        }
-
-        /* Form elements */
-        label {
-            display: block;
-            font-size: 12px;
-            font-weight: 500;
-            color: var(--gray);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 6px;
-            margin-top: 14px;
-        }
+        .app-tagline { font-size: 13px; color: var(--gray); margin-top: 4px; }
+        .card { background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); padding: 24px; margin-bottom: 16px; }
+        .card-title { font-family: 'Sora', sans-serif; font-size: 18px; font-weight: 700; color: #1e293b; margin-bottom: 20px; }
+        label { display: block; font-size: 12px; font-weight: 500; color: var(--gray); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; margin-top: 14px; }
         label:first-of-type { margin-top: 0; }
-
-        input, select, textarea {
-            width: 100%;
-            padding: 12px 14px;
-            border: 1.5px solid var(--border);
-            border-radius: 10px;
-            font-family: 'DM Sans', sans-serif;
-            font-size: 15px;
-            color: #1e293b;
-            background: var(--light);
-            outline: none;
-            transition: border-color 0.2s;
-        }
-        input:focus, select:focus {
-            border-color: var(--primary);
-            background: #fff;
-        }
-
-        /* Buttons */
-        .btn {
-            width: 100%;
-            padding: 14px;
-            border: none;
-            border-radius: 10px;
-            font-family: 'Sora', sans-serif;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.15s, opacity 0.2s;
-            margin-top: 10px;
-        }
+        input, select { width: 100%; padding: 12px 14px; border: 1.5px solid var(--border); border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 15px; color: #1e293b; background: var(--light); outline: none; transition: border-color 0.2s; }
+        input:focus, select:focus { border-color: var(--primary); background: #fff; }
+        .btn { width: 100%; padding: 14px; border: none; border-radius: 10px; font-family: 'Sora', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; transition: transform 0.15s, opacity 0.2s; margin-top: 10px; }
         .btn:active { transform: scale(0.98); }
         .btn-primary { background: var(--primary); color: white; }
         .btn-primary:hover { background: var(--primary-dark); }
@@ -121,315 +40,117 @@
         .btn-green:hover { background: var(--green-dark); }
         .btn-gray { background: #e5e7eb; color: #374151; }
         .btn-gray:hover { background: #d1d5db; }
-
-        /* Home screen big buttons */
-        .home-btn {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            background: var(--white);
-            border: none;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            padding: 20px 22px;
-            width: 100%;
-            cursor: pointer;
-            text-align: left;
-            margin-bottom: 14px;
-            transition: transform 0.15s, box-shadow 0.15s;
-        }
+        .home-btn { display: flex; align-items: center; gap: 16px; background: var(--white); border: none; border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px 22px; width: 100%; cursor: pointer; text-align: left; margin-bottom: 14px; transition: transform 0.15s, box-shadow 0.15s; }
         .home-btn:active { transform: scale(0.98); }
         .home-btn:hover { box-shadow: 0 8px 32px rgba(0,0,0,0.12); }
-        .home-btn-icon {
-            width: 52px;
-            height: 52px;
-            border-radius: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            flex-shrink: 0;
-        }
+        .home-btn-icon { width: 52px; height: 52px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; }
         .icon-orange { background: #fff3ed; }
         .icon-green { background: #f0fdf4; }
-        .home-btn-text h3 {
-            font-family: 'Sora', sans-serif;
-            font-size: 16px;
-            font-weight: 700;
-            color: #1e293b;
-        }
-        .home-btn-text p {
-            font-size: 13px;
-            color: var(--gray);
-            margin-top: 2px;
-        }
-
-        /* Job cards */
-        .job-card {
-            background: var(--white);
-            border: 1.5px solid var(--border);
-            border-radius: var(--radius);
-            padding: 18px;
-            margin-bottom: 14px;
-        }
-        .job-card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 12px;
-        }
-        .job-type {
-            font-family: 'Sora', sans-serif;
-            font-size: 17px;
-            font-weight: 700;
-            color: #1e293b;
-        }
-        .job-badge {
-            background: #fff3ed;
-            color: var(--primary);
-            font-size: 12px;
-            font-weight: 600;
-            padding: 4px 10px;
-            border-radius: 20px;
-        }
-        .job-info {
-            display: flex;
-            flex-direction: column;
-            gap: 7px;
-            margin-bottom: 14px;
-        }
-        .job-info-row {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 14px;
-            color: #374151;
-        }
+        .home-btn-text h3 { font-family: 'Sora', sans-serif; font-size: 16px; font-weight: 700; color: #1e293b; }
+        .home-btn-text p { font-size: 13px; color: var(--gray); margin-top: 2px; }
+        .job-card { background: var(--white); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 18px; margin-bottom: 14px; }
+        .job-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+        .job-type { font-family: 'Sora', sans-serif; font-size: 17px; font-weight: 700; color: #1e293b; }
+        .job-badge { background: #fff3ed; color: var(--primary); font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 20px; }
+        .job-info { display: flex; flex-direction: column; gap: 7px; margin-bottom: 14px; }
+        .job-info-row { display: flex; align-items: center; gap: 8px; font-size: 14px; color: #374151; }
         .job-info-row .icon { font-size: 16px; }
         .job-info-row strong { color: #1e293b; }
-        .map-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            color: var(--primary);
-            font-size: 13px;
-            font-weight: 600;
-            text-decoration: none;
-            padding: 6px 12px;
-            background: #fff3ed;
-            border-radius: 8px;
-            margin-bottom: 12px;
-        }
-
-        /* Slots bar */
+        .map-link { display: inline-flex; align-items: center; gap: 5px; color: var(--primary); font-size: 13px; font-weight: 600; text-decoration: none; padding: 6px 12px; background: #fff3ed; border-radius: 8px; margin-bottom: 12px; }
         .slots-bar-wrap { margin-bottom: 14px; }
-        .slots-label {
-            display: flex;
-            justify-content: space-between;
-            font-size: 12px;
-            color: var(--gray);
-            margin-bottom: 5px;
-        }
-        .slots-bar {
-            height: 6px;
-            background: #e5e7eb;
-            border-radius: 3px;
-            overflow: hidden;
-        }
-        .slots-fill {
-            height: 100%;
-            background: var(--green);
-            border-radius: 3px;
-            transition: width 0.4s;
-        }
-
-        /* Notice box */
-        .notice-box {
-            background: #f0fdf4;
-            border: 1.5px solid #bbf7d0;
-            border-radius: 10px;
-            padding: 14px 16px;
-            font-size: 13.5px;
-            color: #166534;
-            margin-top: 16px;
-            line-height: 1.5;
-        }
-        .notice-box.orange {
-            background: #fff7ed;
-            border-color: #fed7aa;
-            color: #9a3412;
-        }
-
-        /* Empty state */
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: var(--gray);
-        }
+        .slots-label { display: flex; justify-content: space-between; font-size: 12px; color: var(--gray); margin-bottom: 5px; }
+        .slots-bar { height: 6px; background: #e5e7eb; border-radius: 3px; overflow: hidden; }
+        .slots-fill { height: 100%; background: var(--green); border-radius: 3px; }
+        .empty-state { text-align: center; padding: 40px 20px; color: var(--gray); }
         .empty-state .emoji { font-size: 40px; margin-bottom: 12px; }
         .empty-state p { font-size: 15px; }
-
-        /* Loading */
-        .loading {
-            text-align: center;
-            padding: 30px;
-            color: var(--gray);
-            font-size: 14px;
-        }
-
-        /* Back row */
-        .back-row {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 16px;
-            cursor: pointer;
-            color: var(--gray);
-            font-size: 14px;
-            font-weight: 500;
-        }
+        .loading { text-align: center; padding: 30px; color: var(--gray); font-size: 14px; }
+        .back-row { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; cursor: pointer; color: var(--gray); font-size: 14px; font-weight: 500; max-width: 480px; margin-left: auto; margin-right: auto; }
         .back-row:hover { color: var(--primary); }
-
-        /* Modal overlay */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.45);
-            z-index: 100;
-            align-items: flex-end;
-            justify-content: center;
-        }
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 100; align-items: flex-end; justify-content: center; }
         .modal-overlay.open { display: flex; }
-        .modal-box {
-            background: white;
-            border-radius: 20px 20px 0 0;
-            padding: 28px 24px 36px;
-            width: 100%;
-            max-width: 480px;
-            animation: slideUp 0.25s ease;
-        }
-        @keyframes slideUp {
-            from { transform: translateY(100%); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-        .modal-title {
-            font-family: 'Sora', sans-serif;
-            font-size: 18px;
-            font-weight: 700;
-            color: #1e293b;
-            margin-bottom: 18px;
-        }
+        .modal-box { background: white; border-radius: 20px 20px 0 0; padding: 28px 24px 36px; width: 100%; max-width: 480px; animation: slideUp 0.25s ease; }
+        @keyframes slideUp { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .modal-title { font-family: 'Sora', sans-serif; font-size: 18px; font-weight: 700; color: #1e293b; margin-bottom: 18px; }
     </style>
 </head>
 <body>
-
-<!-- HOME SCREEN -->
+ 
+<!-- HOME -->
 <div class="screen active" id="screen-home">
     <div class="app-header">
         <div class="app-logo">Work<span>Link</span></div>
         <div class="app-tagline">Connecting workers & owners through admin</div>
     </div>
-
-    <button class="home-btn" onclick="showScreen('screen-owner')">
+    <button class="home-btn" id="btn-go-owner">
         <div class="home-btn-icon icon-orange">📋</div>
-        <div class="home-btn-text">
-            <h3>Post a Work</h3>
-            <p>I need workers for my event</p>
-        </div>
+        <div class="home-btn-text"><h3>Post a Work</h3><p>I need workers for my event</p></div>
     </button>
-
-    <button class="home-btn" onclick="showScreen('screen-worker')">
+    <button class="home-btn" id="btn-go-worker">
         <div class="home-btn-icon icon-green">💼</div>
-        <div class="home-btn-text">
-            <h3>Find Work</h3>
-            <p>Browse available jobs near you</p>
-        </div>
+        <div class="home-btn-text"><h3>Find Work</h3><p>Browse available jobs near you</p></div>
     </button>
 </div>
-
-<!-- OWNER SCREEN -->
+ 
+<!-- OWNER -->
 <div class="screen" id="screen-owner">
-    <div class="app-header">
-        <div class="app-logo">Work<span>Link</span></div>
-    </div>
-
-    <div class="back-row" onclick="showScreen('screen-home')">
-        ← Back
-    </div>
-
+    <div class="app-header"><div class="app-logo">Work<span>Link</span></div></div>
+    <div class="back-row" id="owner-back">← Back</div>
     <div class="card">
         <div class="card-title">📋 Post New Work</div>
-
         <label>Your Name</label>
         <input type="text" id="owner-name" placeholder="Full name">
-
         <label>Your Phone Number</label>
         <input type="tel" id="owner-phone" placeholder="+91 XXXXX XXXXX">
-
         <label>Work Type</label>
-        <select id="work-type" onchange="toggleOther(this.value)">
+        <select id="work-type">
             <option value="Catering">Catering</option>
             <option value="Cleaning">Cleaning</option>
             <option value="Decoration">Decoration</option>
             <option value="Others">Others</option>
         </select>
         <input type="text" id="other-text" placeholder="Describe your work" style="display:none; margin-top:8px;">
-
         <label>Workers Needed</label>
         <input type="number" id="needed-count" placeholder="e.g. 5" min="1">
-
         <label>Location (Google Maps Link)</label>
         <input type="url" id="work-location" placeholder="https://maps.google.com/...">
-
         <label>Total Budget (₹)</label>
         <input type="number" id="budget" placeholder="e.g. 5000" min="0">
-
-        <button class="btn btn-primary" onclick="postWork()">Submit Work Request</button>
-        <button class="btn btn-gray" onclick="showScreen('screen-home')" style="margin-top:8px;">Cancel</button>
+        <button class="btn btn-primary" id="btn-post-work">Submit Work Request</button>
+        <button class="btn btn-gray" id="btn-owner-cancel">Cancel</button>
     </div>
 </div>
-
-<!-- WORKER SCREEN -->
+ 
+<!-- WORKER -->
 <div class="screen" id="screen-worker">
-    <div class="app-header">
-        <div class="app-logo">Work<span>Link</span></div>
-    </div>
-
-    <div class="back-row" onclick="showScreen('screen-home')">
-        ← Back
-    </div>
-
+    <div class="app-header"><div class="app-logo">Work<span>Link</span></div></div>
+    <div class="back-row" id="worker-back">← Back</div>
     <div class="card" style="padding:16px 20px;">
         <div style="font-size:13px; color:var(--gray); line-height:1.5;">
             🔒 <strong style="color:#1e293b;">Admin mediated</strong> — Owner contact details are not shown. Admin will connect you after confirmation.
         </div>
     </div>
-
     <div id="job-feed"><div class="loading">Loading jobs...</div></div>
-
 </div>
-
-<!-- WORKER CONFIRM MODAL -->
+ 
+<!-- MODAL -->
 <div class="modal-overlay" id="confirm-modal">
     <div class="modal-box">
         <div class="modal-title">✅ Confirm Your Interest</div>
-
         <label>Your Name</label>
         <input type="text" id="worker-name" placeholder="Full name">
-
         <label>Your Phone Number</label>
         <input type="tel" id="worker-phone" placeholder="+91 XXXXX XXXXX">
-
-        <button class="btn btn-green" onclick="submitConfirm()" style="margin-top:16px;">Send to Admin</button>
-        <button class="btn btn-gray" onclick="closeModal()" style="margin-top:8px;">Cancel</button>
+        <button class="btn btn-green" id="btn-submit-confirm" style="margin-top:16px;">Send to Admin</button>
+        <button class="btn btn-gray" id="btn-close-modal" style="margin-top:8px;">Cancel</button>
     </div>
 </div>
-
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, getDocs, updateDoc, doc, arrayUnion } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
-
+ 
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+ 
+<script>
     const firebaseConfig = {
         apiKey: "AIzaSyA03zVPJ3InsB__d2cZHMpo_ktJoyrCXU",
         authDomain: "vinaywrites-a4f43.firebaseapp.com",
@@ -438,54 +159,64 @@
         messagingSenderId: "13814587804",
         appId: "1:13814587804:web:3c461c1a42bd6c6a0ae859"
     };
-
-    const db = getFirestore(initializeApp(firebaseConfig));
+ 
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+ 
     let currentJobId = null;
-
+ 
     // ── Telegram ──────────────────────────────────────────────
     async function sendTelegram(message) {
         const BOT_TOKEN = "8781247032:AAFO15to4OwfwFUhFZGqoeLHt2mx7Z-j_dw";
         const CHAT_ID = "6674906122";
         await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(message)}`);
     }
-
+ 
     // ── Navigation ────────────────────────────────────────────
-    window.showScreen = (id) => {
+    function showScreen(id) {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
         document.getElementById(id).classList.add('active');
         if (id === 'screen-worker') loadJobs();
-    };
-
-    // ── Toggle "Others" input ─────────────────────────────────
-    window.toggleOther = (val) => {
-        document.getElementById('other-text').style.display = (val === 'Others') ? 'block' : 'none';
-    };
-
+    }
+ 
+    // ── Event Listeners ───────────────────────────────────────
+    document.getElementById('btn-go-owner').addEventListener('click', () => showScreen('screen-owner'));
+    document.getElementById('btn-go-worker').addEventListener('click', () => showScreen('screen-worker'));
+    document.getElementById('owner-back').addEventListener('click', () => showScreen('screen-home'));
+    document.getElementById('worker-back').addEventListener('click', () => showScreen('screen-home'));
+    document.getElementById('btn-owner-cancel').addEventListener('click', () => showScreen('screen-home'));
+    document.getElementById('btn-close-modal').addEventListener('click', closeModal);
+    document.getElementById('btn-submit-confirm').addEventListener('click', submitConfirm);
+    document.getElementById('btn-post-work').addEventListener('click', postWork);
+ 
+    document.getElementById('work-type').addEventListener('change', function() {
+        document.getElementById('other-text').style.display = (this.value === 'Others') ? 'block' : 'none';
+    });
+ 
     // ── Post Work ─────────────────────────────────────────────
-    window.postWork = async () => {
-        const name    = document.getElementById('owner-name').value.trim();
-        const phone   = document.getElementById('owner-phone').value.trim();
-        let   type    = document.getElementById('work-type').value;
+    async function postWork() {
+        const name     = document.getElementById('owner-name').value.trim();
+        const phone    = document.getElementById('owner-phone').value.trim();
+        let   type     = document.getElementById('work-type').value;
         if (type === 'Others') type = document.getElementById('other-text').value.trim();
-        const needed  = parseInt(document.getElementById('needed-count').value);
+        const needed   = parseInt(document.getElementById('needed-count').value);
         const location = document.getElementById('work-location').value.trim();
-        const budget  = document.getElementById('budget').value.trim();
-
+        const budget   = document.getElementById('budget').value.trim();
+ 
         if (!name || !phone || !type || !needed || !budget) {
             alert("Please fill all fields."); return;
         }
-
-        await addDoc(collection(db, "WorkRequests"), {
+ 
+        const docRef = await db.collection("WorkRequests").add({
             OwnerName: name,
-            OwnerPhone: phone,       // stored in DB, never shown to workers
+            OwnerPhone: phone,
             Type: type,
             Needed: needed,
             BookedBy: [],
             Location: location,
             Budget: budget
         });
-
-        // Admin gets FULL details including owner phone
+ 
         await sendTelegram(
 `📋 NEW WORK POSTED
 ━━━━━━━━━━━━━━━
@@ -494,34 +225,33 @@
 🔧 Type  : ${type}
 👷 Workers Needed: ${needed}
 💰 Budget: ₹${budget}
-📍 Location: ${location}`
+📍 Location: ${location}
+🆔 Job ID: ${docRef.id}`
         );
-
+ 
         alert("✅ Work posted! Admin will contact you shortly.");
         showScreen('screen-home');
-
-        // Reset form
         ['owner-name','owner-phone','needed-count','work-location','budget'].forEach(id => {
             document.getElementById(id).value = '';
         });
         document.getElementById('work-type').value = 'Catering';
         document.getElementById('other-text').style.display = 'none';
-    };
-
+    }
+ 
     // ── Load Jobs ─────────────────────────────────────────────
     async function loadJobs() {
         const feed = document.getElementById('job-feed');
-        feed.innerHTML = '<div class="loading">Loading jobs...</div>';
-        const snapshot = await getDocs(collection(db, "WorkRequests"));
-
+        feed.innerHTML = '<div class="loading">⏳ Loading jobs...</div>';
+        const snapshot = await db.collection("WorkRequests").get();
+ 
         let html = '';
         snapshot.forEach((docSnap) => {
             const d = docSnap.data();
             const bookedCount = d.BookedBy ? d.BookedBy.length : 0;
             const remaining   = d.Needed - bookedCount;
-            const perPerson   = ((d.Budget * 0.9) / d.Needed).toFixed(0);
+            const perPerson   = Math.floor((d.Budget * 0.9) / d.Needed);
             const fillPct     = Math.round((bookedCount / d.Needed) * 100);
-
+ 
             if (remaining > 0) {
                 html += `
                 <div class="job-card">
@@ -548,38 +278,37 @@
                 </div>`;
             }
         });
-
+ 
         feed.innerHTML = html || `
             <div class="empty-state">
                 <div class="emoji">🔍</div>
                 <p>No jobs available right now.<br>Check back soon!</p>
             </div>`;
     }
-
+ 
     // ── Modal ─────────────────────────────────────────────────
-    window.openModal = (jobId) => {
+    function openModal(jobId) {
         currentJobId = jobId;
         document.getElementById('worker-name').value = '';
         document.getElementById('worker-phone').value = '';
         document.getElementById('confirm-modal').classList.add('open');
-    };
-
-    window.closeModal = () => {
+    }
+ 
+    function closeModal() {
         document.getElementById('confirm-modal').classList.remove('open');
         currentJobId = null;
-    };
-
-    window.submitConfirm = async () => {
+    }
+ 
+    async function submitConfirm() {
         const name  = document.getElementById('worker-name').value.trim();
         const phone = document.getElementById('worker-phone').value.trim();
         if (!name || !phone) { alert("Please enter your name and phone."); return; }
         if (!currentJobId) return;
-
-        await updateDoc(doc(db, "WorkRequests", currentJobId), {
-            BookedBy: arrayUnion({ name, phone })
+ 
+        await db.collection("WorkRequests").doc(currentJobId).update({
+            BookedBy: firebase.firestore.FieldValue.arrayUnion({ name, phone })
         });
-
-        // Admin gets worker details
+ 
         await sendTelegram(
 `💼 WORKER INTERESTED
 ━━━━━━━━━━━━━━━
@@ -587,11 +316,11 @@
 📞 Phone: ${phone}
 🆔 Job ID: ${currentJobId}`
         );
-
+ 
         closeModal();
         alert("✅ Your details sent to Admin. Admin will contact you!");
         loadJobs();
-    };
+    }
 </script>
 </body>
 </html>
