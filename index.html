@@ -1,43 +1,83 @@
-=<!DOCTYPE html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
     <title>Catering Boys App</title>
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
-        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyA03zVPJ3InsB__d2cZHMpo_ktJoyrCXU",
-            authDomain: "vinaywrites-a4f43.firebaseapp.com",
-            projectId: "vinaywrites-a4f43",
-            storageBucket: "vinaywrites-a4f43.appspot.com",
-            messagingSenderId: "13814587804",
-            appId: "1:13814587804:web:3c461c1a42bd6c6a0ae859"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-
-        async function fetchUsers() {
-            const usersListDiv = document.getElementById("users-list");
-            try {
-                const querySnapshot = await getDocs(collection(db, "Users"));
-                usersListDiv.innerHTML = "<h3>Users List:</h3>";
-                querySnapshot.forEach((doc) => {
-                    const data = doc.data();
-                    usersListDiv.innerHTML += `<p>Name: ${data.Name || 'N/A'}</p>`;
-                });
-            } catch (e) {
-                usersListDiv.innerHTML = "<p>Error: " + e.message + "</p>";
-            }
-        }
-        
-        // పేజీ లోడ్ అవ్వగానే ఫంక్షన్‌ని రన్ చేస్తుంది
-        window.onload = fetchUsers;
-    </script>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background-color: #f4f4f9; }
+        .container { max-width: 500px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        input, button { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        button { background-color: #28a745; color: white; border: none; cursor: pointer; }
+        button:hover { background-color: #218838; }
+        h2 { text-align: center; color: #333; }
+    </style>
 </head>
 <body>
-    <h1>Catering Boys App</h1>
-    <div id="users-list">Loading users...</div>
+
+<div class="container">
+    <h2>Post New Work</h2>
+    <form id="work-post-form">
+        <input type="text" id="work-location" placeholder="Work Location" required>
+        <input type="number" id="boys-needed" placeholder="No. of Boys Needed" required>
+        <input type="number" id="budget" placeholder="Budget Amount" required>
+        <button type="submit">Post Work</button>
+    </form>
+</div>
+
+<div class="container" style="margin-top: 20px;">
+    <h3>Available Works</h3>
+    <div id="work-list">Loading works...</div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyA03zVPJ3InsB__d2cZHMpo_ktJoyrCXU",
+        authDomain: "vinaywrites-a4f43.firebaseapp.com",
+        projectId: "vinaywrites-a4f43",
+        storageBucket: "vinaywrites-a4f43.appspot.com",
+        messagingSenderId: "13814587804",
+        appId: "1:13814587804:web:3c461c1a42bd6c6a0ae859"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // 1. Work Post cheyadaniki function
+    document.getElementById("work-post-form").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const location = document.getElementById("work-location").value;
+        const boys = document.getElementById("boys-needed").value;
+        const budget = document.getElementById("budget").value;
+
+        try {
+            await addDoc(collection(db, "WorkRequests"), {
+                Location: location,
+                BoysNeeded: boys,
+                Budget: budget,
+                Status: "Pending"
+            });
+            alert("Work posted successfully!");
+            location.reload();
+        } catch (e) {
+            alert("Error: " + e.message);
+        }
+    });
+
+    // 2. Work ni display cheyadaniki function
+    async function loadWorks() {
+        const listDiv = document.getElementById("work-list");
+        const querySnapshot = await getDocs(collection(db, "WorkRequests"));
+        listDiv.innerHTML = "";
+        querySnapshot.forEach((doc) => {
+            const data = doc.data();
+            listDiv.innerHTML += `<p><strong>${data.Location}</strong> - ${data.BoysNeeded} boys | ₹${data.Budget}</p>`;
+        });
+    }
+    
+    window.onload = loadWorks;
+</script>
 </body>
 </html>
