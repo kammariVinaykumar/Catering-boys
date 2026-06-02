@@ -1,20 +1,27 @@
-// Example Flutter Structure for Login
-import 'package:flutter/material.dart';
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Catering Boys App</title>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
+</head>
+<body>
+    <div id="login-container">
+        <h2>Welcome to Catering Boys</h2>
+        <input type="tel" id="phone" placeholder="Enter Mobile Number">
+        <button onclick="sendOTP()">Get OTP</button>
+    </div>
 
-class LoginScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text("Catering Boys Login", style: TextStyle(fontSize: 24)),
-            TextField(decoration: InputDecoration(labelText: 'Enter Phone Number')),
-            ElevatedButton(onPressed: () { /* OTP Logic */ }, child: Text('Get OTP')),
-          ],
-        ),
-      ),
-    );
-  }
-}
+    <script>
+        function sendOTP() {
+            const phone = document.getElementById('phone').value;
+            // Ikkada Firebase Auth logic vasthundi
+            console.log("OTP sending to: " + phone);
+        }
+        
+        // Location Access check
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(showPosition);
+        }
+    </script>
+</body>
+</html>
