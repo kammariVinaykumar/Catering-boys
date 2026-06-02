@@ -1,47 +1,38 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Catering Boys App</title>
-    <script type="module">
-        // Firebase SDK imports
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
-        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
+    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
 
-        // Firebase Configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyA03zVPJ3InsB__d2cZHMpo_ktJoyrCXU",
-            authDomain: "vinaywrites-a4f43.firebaseapp.com",
-            projectId: "vinaywrites-a4f43",
-            storageBucket: "vinaywrites-a4f43.appspot.com",
-            messagingSenderId: "13814587804",
-            appId: "1:13814587804:web:3c461c1a42bd6c6a0ae859"
-        };
+    const firebaseConfig = {
+        apiKey: "AIzaSyA03zVPJ3InsB__d2cZHMpo_ktJoyrCXU",
+        authDomain: "vinaywrites-a4f43.firebaseapp.com",
+        projectId: "vinaywrites-a4f43",
+        storageBucket: "vinaywrites-a4f43.appspot.com",
+        messagingSenderId: "13814587804",
+        appId: "1:13814587804:web:3c461c1a42bd6c6a0ae859"
+    };
 
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        console.log("Firebase Connected Successfully!");
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
-        // Fetching Data from Firestore
+    async function fetchUsers() {
         const usersListDiv = document.getElementById("users-list");
-        async function fetchUsers() {
-            try {
-                const querySnapshot = await getDocs(collection(db, "Users"));
-                usersListDiv.innerHTML = "<h3>Users List:</h3>";
+        try {
+            const querySnapshot = await getDocs(collection(db, "Users"));
+            usersListDiv.innerHTML = "<h3>Users List:</h3>";
+            
+            if (querySnapshot.empty) {
+                usersListDiv.innerHTML += "<p>No users found in database.</p>";
+            } else {
                 querySnapshot.forEach((doc) => {
                     const user = doc.data();
-                    usersListDiv.innerHTML += `<p>Name: ${user.Name} | Phone: ${user.Phone} | Role: ${user.Role}</p>`;
+                    usersListDiv.innerHTML += `<p>Name: ${user.Name || 'N/A'} | Phone: ${user.Phone || 'N/A'} | Role: ${user.Role || 'N/A'}</p>`;
                 });
-            } catch (error) {
-                console.error("Error fetching data: ", error);
             }
+        } catch (error) {
+            console.error("Error details:", error);
+            usersListDiv.innerHTML = "<p>Error loading data. Check Console (F12).</p>";
         }
-        
-        fetchUsers();
-    </script>
-</head>
-<body>
-    <h1>Catering Boys App Ready!</h1>
-    <div id="users-list">Loading users...</div>
-</body>
-</html>
+    }
+    
+    fetchUsers();
+</script>
