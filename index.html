@@ -2,31 +2,58 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Catering Boys App</title>
+    <title>Catering & Services App</title>
     <style>
-        body { font-family: sans-serif; padding: 20px; background-color: #f4f4f9; }
-        .container { max-width: 500px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        input, button { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-        button { background-color: #28a745; color: white; border: none; cursor: pointer; }
-        button:hover { background-color: #218838; }
-        h2 { text-align: center; color: #333; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; padding: 20px; }
+        .container { max-width: 500px; margin: auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: #1a73e8; }
+        input, select, button { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
+        button { background-color: #1a73e8; color: white; border: none; cursor: pointer; font-size: 16px; }
+        .job-card { border: 1px solid #eee; padding: 15px; margin: 10px 0; border-radius: 8px; background: #fff; }
+        .back-btn { background-color: gray; margin-top: 10px; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h2>Post New Work</h2>
-    <form id="work-post-form">
-        <input type="text" id="work-location" placeholder="Work Location" required>
-        <input type="number" id="boys-needed" placeholder="No. of Boys Needed" required>
-        <input type="number" id="budget" placeholder="Budget Amount" required>
-        <button type="submit">Post Work</button>
-    </form>
+<!-- Main Home Selection -->
+<div class="container" id="main-menu">
+    <h1>Welcome!</h1>
+    <button onclick="showSection('owner-post')">Posting a Work</button>
+    <button onclick="showSection('worker-reg')" style="background-color: #28a745;">Looking for Work</button>
 </div>
 
-<div class="container" style="margin-top: 20px;">
-    <h3>Available Works</h3>
-    <div id="work-list">Loading works...</div>
+<!-- Owner Post Form -->
+<div class="container" id="owner-post" style="display:none;">
+    <h2>Post New Work</h2>
+    <input type="text" id="owner-name" placeholder="Owner Name" required>
+    <input type="tel" id="owner-phone" placeholder="Phone Number" required>
+    <select id="work-type">
+        <option value="Catering">Catering</option>
+        <option value="Cleaning">Cleaning</option>
+        <option value="Decoration">Decoration</option>
+    </select>
+    <label style="font-size:12px; color:gray;">(Google Maps లో మీ ఏరియా సెర్చ్ చేసి 'Share' నొక్కి లింక్ కాపీ చేయండి)</label>
+    <input type="url" id="work-location" placeholder="Paste Google Maps Link" required>
+    <input type="number" id="budget" placeholder="Total Amount (₹)" required>
+    <button onclick="postWork()">Submit Work</button>
+    <button class="back-btn" onclick="showSection('main-menu')">Back</button>
+</div>
+
+<!-- Worker Registration Form -->
+<div class="container" id="worker-reg" style="display:none;">
+    <h2>Worker Registration</h2>
+    <input type="text" id="w-name" placeholder="Full Name" required>
+    <input type="tel" id="w-phone" placeholder="Phone Number" required>
+    <input type="text" id="w-location" placeholder="Current Area/Location" required>
+    <button onclick="registerWorker()" style="background-color: #28a745;">Register & View Jobs</button>
+    <button class="back-btn" onclick="showSection('main-menu')">Back</button>
+</div>
+
+<!-- Worker Dashboard -->
+<div class="container" id="worker-dashboard" style="display:none;">
+    <h2>Available Jobs</h2>
+    <div id="job-feed"></div>
+    <button class="back-btn" onclick="showSection('main-menu')">Back to Home</button>
 </div>
 
 <script type="module">
@@ -45,39 +72,51 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // 1. Work Post cheyadaniki function
-    document.getElementById("work-post-form").addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const location = document.getElementById("work-location").value;
-        const boys = document.getElementById("boys-needed").value;
-        const budget = document.getElementById("budget").value;
+    window.showSection = function(id) {
+        document.getElementById('main-menu').style.display = (id === 'main-menu') ? 'block' : 'none';
+        document.getElementById('owner-post').style.display = (id === 'owner-post') ? 'block' : 'none';
+        document.getElementById('worker-reg').style.display = (id === 'worker-reg') ? 'block' : 'none';
+        document.getElementById('worker-dashboard').style.display = (id === 'worker-dashboard') ? 'block' : 'none';
+        if(id === 'worker-dashboard') loadJobs();
+    };
 
-        try {
-            await addDoc(collection(db, "WorkRequests"), {
-                Location: location,
-                BoysNeeded: boys,
-                Budget: budget,
-                Status: "Pending"
-            });
-            alert("Work posted successfully!");
-            location.reload();
-        } catch (e) {
-            alert("Error: " + e.message);
-        }
-    });
+    window.postWork = async function() {
+        const name = document.getElementById('owner-name').value;
+        const loc = document.getElementById('work-location').value;
+        const budget = document.getElementById('budget').value;
+        if(!name || !loc || !budget) { alert("అన్ని వివరాలు నింపండి!"); return; }
 
-    // 2. Work ni display cheyadaniki function
-    async function loadWorks() {
-        const listDiv = document.getElementById("work-list");
+        await addDoc(collection(db, "WorkRequests"), {
+            OwnerName: name,
+            Type: document.getElementById('work-type').value,
+            Location: loc,
+            Budget: budget
+        });
+        alert("Work Posted Successfully!");
+        showSection('main-menu');
+    }
+
+    window.registerWorker = async function() {
+        alert("Registration Successful!");
+        showSection('worker-dashboard');
+    }
+
+    async function loadJobs() {
+        const feed = document.getElementById('job-feed');
         const querySnapshot = await getDocs(collection(db, "WorkRequests"));
-        listDiv.innerHTML = "";
+        feed.innerHTML = "";
         querySnapshot.forEach((doc) => {
             const data = doc.data();
-            listDiv.innerHTML += `<p><strong>${data.Location}</strong> - ${data.BoysNeeded} boys | ₹${data.Budget}</p>`;
+            const earnings = data.Budget * 0.9;
+            feed.innerHTML += `
+                <div class="job-card">
+                    <h4>Work Type: ${data.Type}</h4>
+                    <p>Earnings: ₹${earnings}</p>
+                    <a href="${data.Location}" target="_blank">Open Google Maps</a><br>
+                    <button onclick="alert('Confirmed!')" style="background-color: #28a745; margin-top:10px;">Confirm Job</button>
+                </div>`;
         });
     }
-    
-    window.onload = loadWorks;
 </script>
 </body>
 </html>
