@@ -94,10 +94,6 @@
     .meter-track { height: 14px; background: rgba(255,255,255,0.05); border-radius: 7px; display: flex; overflow: hidden; }
     .meter-red { background: linear-gradient(90deg, #b91c1c, #ef4444); height: 100%; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; color: white; transition: width 0.6s ease; }
     .meter-blue { background: linear-gradient(90deg, #3b82f6, #1d4ed8); height: 100%; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; color: white; transition: width 0.6s ease; }
-    .hist-body { display: flex; flex-wrap: wrap; gap: 4px; max-height: 40px; overflow-y: auto; justify-content: flex-start; }
-    .hist-badge { width: 20px; height: 20px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 800; }
-    .hist-r { background: rgba(239,68,68,0.2); color: #f87171; border: 1px solid rgba(239,68,68,0.3); }
-    .hist-b { background: rgba(59,130,246,0.2); color: #60a5fa; border: 1px solid rgba(59,130,246,0.3); }
 
     /* ===== BOARD SCALING (PERFECT FIT) ===== */
     .center-col { display: flex; flex: 1; align-items: center; justify-content: center; width: 100%; min-height: 0; padding: 4px 0; }
@@ -165,7 +161,18 @@
   <div id="start-screen">
     <h1 class="game-title">ShellKoin 7x7</h1>
     <p class="game-subtitle">The Ultimate Board Game</p>
-    <button class="start-btn" id="start-btn-action">Start Game</button>
+    
+    <div id="step-1">
+      <button class="start-btn" id="start-btn-action">Start Game</button>
+    </div>
+
+    <div id="step-2" style="display:none; text-align:center;">
+      <p style="color:var(--gold); margin-bottom:15px; font-weight:bold; letter-spacing:1px;">మీరు ఎలా ఆడుతున్నారు?</p>
+      <div style="display:flex; gap:10px; justify-content:center;">
+          <button class="start-btn" style="padding: 12px 24px; font-size:16px;" onclick="startGameMode('mobile')">📱 Mobile</button>
+          <button class="start-btn" style="padding: 12px 24px; font-size:16px;" onclick="startGameMode('laptop')">💻 Laptop</button>
+      </div>
+    </div>
   </div>
 
   <!-- RESTART SCREEN -->
@@ -176,7 +183,7 @@
   </div>
 
   <!-- MAIN GAME UI (FACE-TO-FACE LAYOUT) -->
-  <div class="game-wrap">
+  <div class="game-wrap" id="main-game" style="display:none;">
 
     <!-- P2 CONTROLS (BLUE) - TOP OF SCREEN, ROTATED 180 DEG -->
     <div class="player-panel blue-panel" id="p2-panel">
@@ -207,12 +214,6 @@
           కిల్స్: <span id="p2-kills">0</span> | పర్మిషన్: <span id="p2-perm">❌</span> | 
           <div class="strikes-row" id="p2-strikes"></div>
         </div>
-      </div>
-
-      <!-- 4. Extra: History (Visually at the outer edge of screen) -->
-      <div class="extra-box">
-        <div class="col-header" onclick="toggleHist()">📜 రోల్ హిస్టరీ (History) <span id="hist-arrow">▼</span></div>
-        <div class="col-content" id="hist-body" style="display:none;"></div>
       </div>
 
     </div>
@@ -274,7 +275,6 @@
 
   <!-- JAVASCRIPT (LOGIC) -->
   <script>
-    // ===== AUDIO ENGINE =====
     const SFX = {
       ctx: null,
       init() { if (!this.ctx) { this.ctx = new (window.AudioContext || window.webkitAudioContext)(); } if (this.ctx.state === 'suspended') this.ctx.resume(); },
@@ -292,15 +292,13 @@
       }
     };
 
-    // ===== PATHS =====
-    const p1Path = ["1,4","1,3","1,2","1,1","2,1","3,1","4,1","5,1","6,1","7,1","7,2","7,3","7,4","7,5","7,6","7,7","6,7","5,7","4,7","3,7","2,7","1,7","1,6","1,5","2,6","3,6","4,6","5,6","6,6","6,5","6,4","6,3","6,2","5,2","4,2","3,2","2,2","2,3","2,4","2,5","3,5","4,5","5,5","5,4","5,3","4,3","3,3","3,4","4,4"];
-    const p2Path = ["7,4","7,5","7,6","7,7","6,7","5,7","4,7","3,7","2,7","1,7","1,6","1,5","1,4","1,3","1,2","1,1","2,1","3,1","4,1","5,1","6,1","7,1","7,2","7,3","6,2","5,2","4,2","3,2","2,2","2,3","2,4","2,5","2,6","3,6","4,6","5,6","6,6","6,5","6,4","6,3","5,3","4,3","3,3","3,4","3,5","4,5","5,5","5,4","4,4"];
+    const p1Path = ["7,4","7,5","7,6","7,7","6,7","5,7","4,7","3,7","2,7","1,7","1,6","1,5","1,4","1,3","1,2","1,1","2,1","3,1","4,1","5,1","6,1","7,1","7,2","7,3","6,2","5,2","4,2","3,2","2,2","2,3","2,4","2,5","2,6","3,6","4,6","5,6","6,6","6,5","6,4","6,3","5,3","4,3","3,3","3,4","3,5","4,5","5,5","5,4","4,4"];
+    const p2Path = ["1,4","1,3","1,2","1,1","2,1","3,1","4,1","5,1","6,1","7,1","7,2","7,3","7,4","7,5","7,6","7,7","6,7","5,7","4,7","3,7","2,7","1,7","1,6","1,5","2,6","3,6","4,6","5,6","6,6","6,5","6,4","6,3","6,2","5,2","4,2","3,2","2,2","2,3","2,4","2,5","3,5","4,5","5,5","5,4","5,3","4,3","3,3","3,4","4,4"];
     const safeZones = ["1,4","4,7","7,4","4,1","4,4"];
     const layer2Coords = p1Path.slice(24, 40);
 
-    // ===== GAME STATE =====
     function getInitialState() {
-      return { currentPlayer: 1, currentRoll: 0, hasRolled: false, p1Tokens: [-1,-1,-1,-1], p2Tokens: [-1,-1,-1,-1], isGameOver: false, extraTurn: false, p1Kills: 0, p2Kills: 0, p1PortalUsed: false, p2PortalUsed: false, p1BonusPending: false, p2BonusPending: false, p1Revenge: false, p2Revenge: false, p1MissCount: 0, p2MissCount: 0, p1Timeouts: 0, p2Timeouts: 0, shielded: { player: null, idx: null }, timerInterval: null, maxP1: 0, maxP2: 0, histOpen: false };
+      return { currentPlayer: 1, currentRoll: 0, hasRolled: false, p1Tokens: [-1,-1,-1,-1], p2Tokens: [-1,-1,-1,-1], isGameOver: false, extraTurn: false, p1Kills: 0, p2Kills: 0, p1PortalUsed: false, p2PortalUsed: false, p1BonusPending: false, p2BonusPending: false, p1Revenge: false, p2Revenge: false, p1MissCount: 0, p2MissCount: 0, p1Timeouts: 0, p2Timeouts: 0, shielded: { player: null, idx: null }, timerInterval: null, maxP1: 0, maxP2: 0, device: 'mobile' };
     }
     let G = getInitialState();
     let activePortal = null, portalTimer = null;
@@ -308,21 +306,17 @@
     let turnTimeLeft = 100;
     let curMovEls=[], selMovIdx=-1;
 
-    // LocalStorage (Auto-Save)
-    function saveGameState() { if (G.isGameOver) return; const stateToSave = { ...G, timerInterval: null }; localStorage.setItem('shellkoin_state', JSON.stringify(stateToSave)); }
-    function loadGameState() { const saved = localStorage.getItem('shellkoin_state'); if (saved) { try { G = { ...getInitialState(), ...JSON.parse(saved) }; return true; } catch(e) { return false; } } return false; }
-    function clearGameState() { localStorage.removeItem('shellkoin_state'); }
+    function saveGameState() { if (G.isGameOver) return; const stateToSave = { ...G, timerInterval: null }; localStorage.setItem('shellkoin_state_new', JSON.stringify(stateToSave)); }
+    function loadGameState() { const saved = localStorage.getItem('shellkoin_state_new'); if (saved) { try { G = { ...getInitialState(), ...JSON.parse(saved) }; return true; } catch(e) { return false; } } return false; }
+    function clearGameState() { localStorage.removeItem('shellkoin_state_new'); }
 
-    // ===== INITIALIZATION & UI SETUP =====
     function updKeySel(){ curMovEls.forEach((e,i)=>e.classList.toggle('key-selected',i===selMovIdx)); }
     
     let predOpen = false;
     function togglePred() { predOpen = !predOpen; document.getElementById('pred-body').style.display = predOpen ? 'block' : 'none'; document.getElementById('pred-arrow').textContent = predOpen ? '▲' : '▼'; }
-    function toggleHist() { G.histOpen = !G.histOpen; document.getElementById('hist-body').style.display = G.histOpen ? 'flex' : 'none'; document.getElementById('hist-arrow').textContent = G.histOpen ? '▲' : '▼'; }
 
     function restartGame() {
         G = getInitialState(); clearGameState();
-        document.getElementById('hist-body').innerHTML = ''; 
         document.getElementById('restart-screen').style.display = 'none';
         removePortal(); removeRedhole(); updateStrikeDisplay(); resetRoll();
     }
@@ -336,7 +330,6 @@
         }, 3000);
     }
 
-    // DRAW BOARD CELLS
     const boardEl = document.getElementById('game-board');
     for (let r=1; r<=7; r++) {
       for (let c=1; c<=7; c++) {
@@ -356,7 +349,6 @@
       }
     }
 
-    // ===== TIMER & PENALTY =====
     function startTimer() {
       if (G.isGameOver) return;
       clearInterval(G.timerInterval); turnTimeLeft = 100;
@@ -409,7 +401,6 @@
       });
     }
 
-    // ===== TRAPS & EFFECTS =====
     function tryPortal() {
       if (G.isGameOver || activePortal) return;
       const onB1 = G.p1Tokens.filter(p=>p!==-1 && p<p1Path.length-1).length, onB2 = G.p2Tokens.filter(p=>p!==-1 && p<p2Path.length-1).length;
@@ -437,7 +428,6 @@
     function removeRedhole() { const el=document.getElementById('redhole-el'); if(el) el.remove(); clearTimeout(redholeTimer); activeRedhole=null; }
     setInterval(tryPortal, 18000); setInterval(tryRedhole, 25000);
 
-    // Common Helpers
     function getCellEl(coord) { if (!coord) return null; return document.getElementById(`c-${coord.replace(',','-')}`); }
     function hasPerm(p) { return p===1 ? (G.p1Kills>0||G.p1PortalUsed) : (G.p2Kills>0||G.p2PortalUsed); }
     function setDualTip(text, type='') { const cls = 'tip-text' + (type ? ` ${type}` : ''); const t1 = document.getElementById('p1-tip'); t1.textContent = text; t1.className = cls; const t2 = document.getElementById('p2-tip'); t2.textContent = text; t2.className = cls; }
@@ -447,7 +437,6 @@
     function shakeBoard() { boardEl.classList.add('shake'); setTimeout(()=>boardEl.classList.remove('shake'), 320); }
     function triggerConfetti() { const c=['#ef4444','#3b82f6','#fbbf24','#4ade80','#a855f7','#f97316']; for (let i=0;i<80;i++) { const p=document.createElement('div'); p.className='confetti-piece'; p.style.left=Math.random()*100+'vw'; p.style.animationDelay=Math.random()*2+'s'; p.style.animationDuration=(Math.random()*3+2)+'s'; p.style.background=c[Math.floor(Math.random()*c.length)]; p.style.borderRadius=Math.random()<0.5?'50%':'2px'; document.body.appendChild(p); setTimeout(()=>p.remove(), 5500); } }
 
-    // ===== GAME LOGIC =====
     function getNextPos(c, s, perm) { if (!perm) { let nx = c + s; if (c<=23 && nx>23) nx -= 24; return nx; } if (c===23) return (c+s)-24; let nx = c+s; if (c<=22 && nx>=23) nx+=1; return nx; }
     function getMovable(roll) { const p = G.currentPlayer, t = p===1?G.p1Tokens:G.p2Tokens, perm = hasPerm(p), res = []; for (let i=0;i<4;i++) { if (t[i]===-1) continue; const nx = getNextPos(t[i], roll, perm); if (nx<p1Path.length) res.push({idx:i, targetPos:nx}); } return res; }
     function boostedRoll(b) { return b===1?3 : b===2?6 : 12; }
@@ -466,7 +455,7 @@
       else if (p===1&&G.p1BonusPending) { if (p1sum<p2sum) final=boostedRoll(base); G.p1BonusPending=false; }
       else if (p===2&&G.p2BonusPending) { if (p2sum<p1sum) final=boostedRoll(base); G.p2BonusPending=false; }
       G.extraTurn = (final===12); G.currentRoll = final; G.hasRolled = true; document.getElementById(`p${p}-result-num`).textContent = final;
-      const hb = document.getElementById('hist-body'); const badge = document.createElement('div'); badge.className = `hist-badge hist-${p===1?'r':'b'}`; badge.textContent = final; hb.prepend(badge);
+      
       const vaultT = p===1?G.p1Tokens:G.p2Tokens; const vaultIdxs = vaultT.reduce((a,v,i)=>v===-1?[...a,i]:a,[]); const hasBoard = vaultT.some(p=>p!==-1&&p<p1Path.length-1);
       if (final===12 && vaultIdxs.length>=2 && !hasBoard) { setDualTip('💥 12 పడింది! 2 కాయిన్స్ రిలీజ్', 'good'); setTimeout(()=>doReleaseTwoVault(p, vaultIdxs[0], vaultIdxs[1]), 900); return; }
       if (final===12 && vaultIdxs.length===1 && !hasBoard) { setDualTip('💥 12 పడింది! 1 కాయిన్ +6 స్టెప్స్', 'good'); setTimeout(()=>doReleaseAndSix(p, vaultIdxs[0]), 900); return; }
@@ -474,7 +463,10 @@
       const movable = getMovable(final); const canRelease = (final===6||final===12) && vaultIdxs.length>0;
       if (!movable.length && !canRelease) { setDualTip('మూవ్ చేయలేం! టర్న్ స్కిప్', ''); setTimeout(()=>switchTurn(true), 1100); }
       else if (movable.length===1 && !canRelease) { setDualTip('ఆటోమేటిక్ మూవ్...', ''); setTimeout(()=>moveToken(p, movable[0].idx), 900); }
-      else { setDualTip('కాయిన్ సెలెక్ట్ చేయండి ("0" నొక్కండి)', ''); updateBoard(); startTimer(); }
+      else { 
+        let tipText = G.device === 'laptop' ? 'కాయిన్ సెలెక్ట్ చేయండి ("0" నొక్కండి)' : 'కాయిన్ సెలెక్ట్ చేయండి (టచ్ చేయండి)';
+        setDualTip(tipText, ''); updateBoard(); startTimer(); 
+      }
     }
 
     function doReleaseTwoVault(p, i1, i2) { stopTimer(); const t = p===1?G.p1Tokens:G.p2Tokens; t[i1]=0; t[i2]=0; sparkle((p===1?p1Path:p2Path)[0]); SFX.play('move'); checkKill(p, (p===1?p1Path:p2Path)[0]); validateShield(); afterMove(); }
@@ -521,16 +513,26 @@
       if (G.isGameOver) return; const p = G.currentPlayer;
       document.getElementById('p1-roll-btn').disabled = (p !== 1); document.getElementById('p2-roll-btn').disabled = (p !== 2);
       document.getElementById('p1-result-num').textContent = '—'; document.getElementById('p2-result-num').textContent = '—';
-      document.getElementById('p1-dot').className = `turn-dot ${p===1?'red':'dim'}`; document.getElementById('p1-label').className = `turn-label ${p===1?'red':'dim'}`;
-      document.getElementById('p2-dot').className = `turn-dot ${p===2?'blue':'dim'}`; document.getElementById('p2-label').className = `turn-label ${p===2?'blue':'dim'}`;
+      
+      document.getElementById('p1-dot').className = `turn-dot ${p===1?'red':'dim'}`; 
+      document.getElementById('p1-label').className = `turn-label ${p===1?'red':'dim'}`;
+      document.getElementById('p1-label').textContent = 'RED వంతు';
+      document.getElementById('p1-label').style.color = '';
+      
+      document.getElementById('p2-dot').className = `turn-dot ${p===2?'blue':'dim'}`; 
+      document.getElementById('p2-label').className = `turn-label ${p===2?'blue':'dim'}`;
+      document.getElementById('p2-label').textContent = 'BLUE వంతు';
+      document.getElementById('p2-label').style.color = '';
       
       ['p1','p2'].forEach(player => { const isPlaying = (player === (p===1?'p1':'p2'));
         for (let i=0;i<4;i++) { const el=document.getElementById(`${player}-s${i}`); el.className='shell-el'; el.textContent='🐚'; }
       });
-      setDualTip(`${p===1?'RED':'BLUE'} వంతు... గవ్వలు వేయండి ("5" నొక్కండి)`, ''); updateBoard(); startTimer();
+      
+      let tipText = `${p===1?'RED':'BLUE'} వంతు... గవ్వలు వేయండి`;
+      tipText += G.device === 'laptop' ? ' ("5" నొక్కండి)' : '';
+      setDualTip(tipText, ''); updateBoard(); startTimer();
     }
 
-    // DRAW UI
     function updateBoard() {
       document.querySelectorAll('.board .token').forEach(t=>t.remove());
       const p = G.currentPlayer, r = G.currentRoll, mov = G.hasRolled ? getMovable(r) : [], movI = mov.map(m=>m.idx);
@@ -611,20 +613,40 @@
         document.getElementById('p1-roll-btn').disabled = (p !== 1 || G.hasRolled); document.getElementById('p2-roll-btn').disabled = (p !== 2 || G.hasRolled);
         document.getElementById('p1-result-num').textContent = (p === 1 && G.hasRolled) ? G.currentRoll : '—';
         document.getElementById('p2-result-num').textContent = (p === 2 && G.hasRolled) ? G.currentRoll : '—';
-        document.getElementById('p1-dot').className = `turn-dot ${p===1?'red':'dim'}`; document.getElementById('p1-label').className = `turn-label ${p===1?'red':'dim'}`;
-        document.getElementById('p2-dot').className = `turn-dot ${p===2?'blue':'dim'}`; document.getElementById('p2-label').className = `turn-label ${p===2?'blue':'dim'}`;
+        
+        document.getElementById('p1-dot').className = `turn-dot ${p===1?'red':'dim'}`; 
+        document.getElementById('p1-label').className = `turn-label ${p===1?'red':'dim'}`;
+        document.getElementById('p1-label').textContent = 'RED వంతు';
+        document.getElementById('p1-label').style.color = '';
+
+        document.getElementById('p2-dot').className = `turn-dot ${p===2?'blue':'dim'}`; 
+        document.getElementById('p2-label').className = `turn-label ${p===2?'blue':'dim'}`;
+        document.getElementById('p2-label').textContent = 'BLUE వంతు';
+        document.getElementById('p2-label').style.color = '';
+
+        const rollTxt = G.device === 'laptop' ? '🎲 గవ్వలు (5)' : '🎲 రోల్ చేయండి';
+        document.getElementById('p1-roll-btn').textContent = rollTxt;
+        document.getElementById('p2-roll-btn').textContent = rollTxt;
+
         ['p1','p2'].forEach(player => {
             const isPlaying = (player === (p===1?'p1':'p2'));
             if(isPlaying && G.hasRolled) { for (let i=0;i<4;i++) { const el=document.getElementById(`${player}-s${i}`); el.className='shell-el down'; el.textContent='บ'; } } 
             else { for (let i=0;i<4;i++) { const el=document.getElementById(`${player}-s${i}`); el.className='shell-el'; el.textContent='🐚'; } }
         });
-        if (G.hasRolled) { setDualTip('కాయిన్ సెలెక్ట్ చేయండి ("0" నొక్కండి)', ''); } else { setDualTip(`${p===1?'RED':'BLUE'} వంతు... గవ్వలు వేయండి`, ''); }
+        if (G.hasRolled) { 
+            let tipText = G.device === 'laptop' ? 'కాయిన్ సెలెక్ట్ చేయండి ("0" నొక్కండి)' : 'కాయిన్ సెలెక్ట్ చేయండి (టచ్ చేయండి)';
+            setDualTip(tipText, ''); 
+        } else { 
+            let tipText = `${p===1?'RED':'BLUE'} వంతు... గవ్వలు వేయండి`;
+            tipText += G.device === 'laptop' ? ' ("5" నొక్కండి)' : '';
+            setDualTip(tipText, ''); 
+        }
+        document.getElementById('main-game').style.display = 'flex';
         updateStrikeDisplay(); updateBoard(); startTimer();
     }
 
-    // ===== KEYBOARD CONTROLS =====
     document.addEventListener('keydown', e => {
-      if(G.isGameOver) return;
+      if(G.isGameOver || document.getElementById('start-screen').style.display !== 'none') return;
       if(e.key === '5') { e.preventDefault(); if(!G.hasRolled) { if(G.currentPlayer === 1 && !document.getElementById('p1-roll-btn').disabled) rollGavvalu(1); else if(G.currentPlayer === 2 && !document.getElementById('p2-roll-btn').disabled) rollGavvalu(2); } }
       else if(e.key === '0') { e.preventDefault(); if(G.hasRolled && selMovIdx > -1 && curMovEls[selMovIdx]) curMovEls[selMovIdx].click(); }
       else if(G.hasRolled && curMovEls.length > 1) {
@@ -633,16 +655,36 @@
       }
     });
 
-    // ===== BOOT =====
     window.onload = function() {
       const startScreen = document.getElementById('start-screen');
       const startBtn = document.getElementById('start-btn-action');
       if (loadGameState()) {
           startScreen.style.display = 'none'; syncUIWithState();
       } else {
-          startBtn.addEventListener('click', () => { SFX.init(); startScreen.style.opacity = '0'; setTimeout(() => { startScreen.style.display = 'none'; updateStrikeDisplay(); resetRoll(); }, 500); });
+          startBtn.addEventListener('click', () => { 
+              SFX.init(); 
+              document.getElementById('step-1').style.display = 'none';
+              document.getElementById('step-2').style.display = 'block';
+          });
       }
     };
+
+    function startGameMode(mode) {
+        G.device = mode;
+        const startScreen = document.getElementById('start-screen');
+        startScreen.style.opacity = '0'; 
+        
+        const rollTxt = mode === 'laptop' ? '🎲 గవ్వలు (5)' : '🎲 రోల్ చేయండి';
+        document.getElementById('p1-roll-btn').textContent = rollTxt;
+        document.getElementById('p2-roll-btn').textContent = rollTxt;
+
+        setTimeout(() => { 
+            startScreen.style.display = 'none';
+            document.getElementById('main-game').style.display = 'flex';
+            updateStrikeDisplay(); 
+            resetRoll(); 
+        }, 500);
+    }
   </script>
 </body>
 </html>
