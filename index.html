@@ -69,6 +69,12 @@
         .mbox{background:#fff;border-radius:20px 20px 0 0;padding:26px 22px 34px;width:100%;max-width:480px;animation:up .22s ease}
         @keyframes up{from{transform:translateY(100%);opacity:0}to{transform:translateY(0);opacity:1}}
         .mtitle{font-family:'Sora',sans-serif;font-size:17px;font-weight:700;color:var(--dark);margin-bottom:16px}
+        #toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--dark);color:#fff;padding:13px 22px;border-radius:30px;font-size:14px;font-weight:600;opacity:0;transition:all .3s;z-index:999;pointer-events:none;max-width:320px;text-align:center;box-shadow:0 4px 20px rgba(0,0,0,.25)}
+        #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+        #toast.success{background:#16a34a}
+        #toast.error{background:#dc2626}
+        #toast.info{background:#2563eb}
+        #toast.warn{background:#d97706}
     </style>
 </head>
 <body>
@@ -173,6 +179,9 @@
     </div>
 </div>
 
+<div id="toast"></div>
+
+<div class="toast" id="toast"></div>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 <script>
@@ -192,6 +201,37 @@ let ownerPhone   = null;
 let workerData   = null;
 let currentJobId = null;
 
+function toast(msg, type='success'){
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast '+type;
+    t.classList.add('show');
+    setTimeout(()=>t.classList.remove('show'), 3000);
+}
+
+function toast(msg, type='success'){
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'show ' + type;
+    clearTimeout(window._toastTimer);
+    window._toastTimer = setTimeout(()=>{ t.className=''; }, 3000);
+}
+
+async function requestDelete(id, oname, ophone, otype, obudget){
+    // Immediately hide from owner view (set deleteRequested flag)
+    await db.collection("WorkRequests").doc(id).update({ deleteRequested: true });
+    await tg("🗑 DELETE REQUESTED
+━━━━━━━━━━━━━━━
+👤 Owner : "+oname+"
+📞 Phone : "+ophone+"
+🔧 Type  : "+otype+"
+💰 Budget: ₹"+obudget+"
+🆔 Job ID: "+id+"
+⚠️ Login to Admin Panel to confirm delete.");
+    toast("Delete request sent to Admin!", "info");
+    loadOwnerFeed();
+}
+
 async function tg(msg){
     try{ await fetch("https://api.telegram.org/bot"+BOT+"/sendMessage?chat_id="+CHAT+"&text="+encodeURIComponent(msg)); }catch(e){}
 }
@@ -210,7 +250,7 @@ document.getElementById('b-worker').onclick = ()=>show('s-worker-reg');
 document.getElementById('bk-owner-login').onclick = ()=>show('s-home');
 document.getElementById('b-owner-enter').onclick   = ()=>{
     const ph = document.getElementById('owner-login-ph').value.trim();
-    if(!ph){ alert("Please enter your phone number."); return; }
+    if(!ph){ toast("Please enter your phone number.", "error"); return; }
     ownerPhone = ph;
     document.getElementById('o-phone').value = ph;
     show('s-owner');
@@ -238,7 +278,7 @@ document.getElementById('b-browse').onclick       = ()=>{
     const name = document.getElementById('w-name').value.trim();
     const ph   = document.getElementById('w-phone').value.trim();
     const loc  = document.getElementById('w-loc').value.trim();
-    if(!name||!ph||!loc){ alert("Please fill all fields."); return; }
+    if(!name||!ph||!loc){ toast("Please fill all fields.", "error"); return; }
     workerData = {name, phone:ph, location:loc};
     show('s-worker');
     loadWorkerJobs();
@@ -260,7 +300,7 @@ async function postWork(){
     const needed = parseInt(document.getElementById('o-needed').value);
     const loc    = document.getElementById('o-loc').value.trim();
     const budget = parseInt(document.getElementById('o-budget').value);
-    if(!name||!phone||!type||!needed||!loc||!budget){ alert("Please fill all fields."); return; }
+    if(!name||!phone||!type||!needed||!loc||!budget){ toast("Please fill all fields.", "error"); return; }
 
     const ref = await db.collection("WorkRequests").add({
         OwnerName:name, OwnerPhone:phone, Type:type,
@@ -268,7 +308,7 @@ async function postWork(){
         Budget:budget, Status:"pending"
     });
     await tg("📋 NEW WORK POSTED — Awaiting Approval\n━━━━━━━━━━━━━━━\n👤 Owner : "+name+"\n📞 Phone : "+phone+"\n🔧 Type  : "+type+"\n👷 Workers: "+needed+"\n💰 Budget: ₹"+budget+"\n📍 "+loc+"\n🆔 Job ID: "+ref.id);
-    alert("✅ Work posted! Admin will review and contact you.");
+    toast("Work posted! Admin will review and contact you.", "success");
     document.getElementById('o-name').value='';
     document.getElementById('o-needed').value='';
     document.getElementById('o-loc').value='';
@@ -292,8 +332,11 @@ async function loadOwnerFeed(){
     snap.forEach(d=>{
         const data=d.data();
         if(data.OwnerPhone !== ownerPhone) return; // only this owner's posts
+        if(data.deleteRequested) return; // hide delete-requested posts from owner
         const badge = data.Status==='approved'
             ? '<span class="badge bg-green">✅ Approved</span>'
+            : data.Status==='delete-requested'
+            ? '<span class="badge" style="background:#fef2f2;color:#ef4444">🗑 Delete Requested</span>'
             : '<span class="badge bg-gray">⏳ Pending</span>';
         html+=`<div class="ocard">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
@@ -301,13 +344,18 @@ async function loadOwnerFeed(){
             </div>
             <div class="det">👷 ${data.Needed} workers &nbsp;|&nbsp; 💰 ₹${data.Budget}</div>
             <div class="det" style="font-size:11px;color:var(--gray)">🆔 ${d.id}</div>
-            ${data.Status !== 'approved' ? `
+            ${data.Status !== 'approved' && !data.deleteRequested ? `
             <div class="hr"></div>
             <div style="font-size:11px;font-weight:600;color:var(--gray);margin-bottom:6px">UPDATE BUDGET</div>
             <div class="brow">
                 <input type="number" id="b-${d.id}" value="${data.Budget}" placeholder="New budget ₹">
                 <button onclick="updateBudget('${d.id}','${data.OwnerName}','${data.OwnerPhone}','${data.Type}')">Update</button>
             </div>` : ''}
+            ${!data.deleteRequested ? `
+            <button class="btn" style="margin-top:8px;background:#fef2f2;color:#dc2626;border:1.5px solid #fecaca;font-size:13px;" 
+                onclick="requestDelete('${d.id}','${data.OwnerName}','${data.OwnerPhone}','${data.Type}','${data.Budget}')">
+                🗑 Request Delete
+            </button>` : `<div style="margin-top:10px;font-size:12px;color:#d97706;font-weight:600;text-align:center;">⏳ Delete pending admin approval</div>`}
         </div>`;
     });
     feed.innerHTML = html||'<div class="empty"><div class="em">📭</div><p>No posts yet.</p></div>';
@@ -315,10 +363,25 @@ async function loadOwnerFeed(){
 
 async function updateBudget(id,oname,ophone,otype){
     const val=parseInt(document.getElementById('b-'+id).value);
-    if(!val||val<=0){ alert("Enter valid budget."); return; }
+    if(!val||val<=0){ toast("Enter valid budget.", "error"); return; }
     await db.collection("WorkRequests").doc(id).update({Budget:val, Status:"pending"});
     await tg("✏️ BUDGET UPDATED — Re-approval Needed\n━━━━━━━━━━━━━━━\n👤 Owner : "+oname+"\n📞 Phone : "+ophone+"\n🔧 Type  : "+otype+"\n💰 New Budget: ₹"+val+"\n🆔 Job ID: "+id);
-    alert("✅ Budget updated! Admin will review and re-approve.");
+    toast("Budget updated! Admin will re-approve.", "success");
+    loadOwnerFeed();
+}
+
+// ── Request Delete ────────────────────────────────────────
+async function requestDelete(id, oname, ophone, otype){
+    if(!confirm("Send delete request to admin?")) return;
+    await db.collection("WorkRequests").doc(id).update({Status:"delete-requested"});
+    await tg("🗑 DELETE REQUESTED
+━━━━━━━━━━━━━━━
+👤 Owner : "+oname+"
+📞 Phone : "+ophone+"
+🔧 Type  : "+otype+"
+🆔 Job ID: "+id+"
+⚠️ Owner wants to delete this post. Please review in Admin Panel.");
+    toast("Delete request sent to admin!","info");
     loadOwnerFeed();
 }
 
@@ -330,7 +393,7 @@ async function loadWorkerJobs(){
     let html='';
     snap.forEach(d=>{
         const data=d.data();
-        if(data.Status!=='approved') return;
+        if(data.Status!=='approved') return; // only show approved (not pending/delete-requested)
         if(workerData && data.OwnerPhone===workerData.phone) return;
         const booked=data.BookedBy?data.BookedBy.length:0;
         const rem=data.Needed-booked;
@@ -370,7 +433,7 @@ function closeModal(){
 async function submitConfirm(){
     const name  = document.getElementById('m-name').value.trim();
     const phone = document.getElementById('m-phone').value.trim();
-    if(!name||!phone){ alert("Please enter your details."); return; }
+    if(!name||!phone){ toast("Please enter your details.", "error"); return; }
     if(!currentJobId) return;
 
     let lat=null,lng=null;
@@ -388,7 +451,7 @@ async function submitConfirm(){
     });
     await tg("💼 WORKER INTERESTED\n━━━━━━━━━━━━━━━\n👤 Name : "+name+"\n📞 Phone: "+phone+"\n🏠 Area : "+(area||'N/A')+"\n"+locTxt+"\n🆔 Job ID: "+currentJobId);
     closeModal();
-    alert("✅ Details sent to Admin. Admin will contact you!");
+    toast("Details sent to Admin. They will contact you!", "success");
     loadWorkerJobs();
 }
 </script>
