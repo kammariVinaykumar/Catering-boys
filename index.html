@@ -153,6 +153,43 @@
     @keyframes board-flash-win { 0%,100% { border-color: var(--board-border); } 50% { border-color: #fbbf24; box-shadow: 0 0 60px rgba(251,191,36,0.6); } }
     .confetti-piece { position: fixed; top: -12px; width: 8px; height: 10px; z-index: 999; animation: fall linear forwards; border-radius: 2px; }
     @keyframes fall { to { transform: translateY(110vh) rotate(720deg); } }
+
+    /* ===== LAPTOP / DESKTOP VIEW (ONLY DESIGN CHANGES) ===== */
+    @media (min-width: 801px) {
+      body { padding: 3vh 2vw; }
+      .game-wrap { flex-direction: row; max-width: 1400px; justify-content: center; align-items: stretch; gap: 4vw; }
+      
+      /* Reorder Panels to Left & Right */
+      .blue-panel { transform: none; order: 1; }
+      .center-col { order: 2; flex: 1; max-width: min(600px, 75vh); display: flex; align-items: center; justify-content: center; }
+      .red-panel { order: 3; }
+      
+      /* Make Panels Spacious */
+      .player-panel { width: 340px; max-width: 25vw; padding: 3vh 2vw; justify-content: flex-start; gap: 2vh; }
+      
+      /* Giant Board */
+      .board-wrap { max-height: none; width: 100%; height: auto; aspect-ratio: 1; }
+      .board { max-height: none; padding: 12px; border-width: 4px; border-radius: 18px; }
+      .cell { border-radius: 14%; }
+      
+      /* Clean Dashboard Layout for Actions */
+      .action-bar { flex-direction: column; gap: 2.5vh; background: rgba(0,0,0,0.2); padding: 2.5vh 2vw; border-radius: 14px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 0; }
+      .roll-btn-mini { max-width: 100%; padding: 1.5vh 0; font-size: 1.2rem; border-radius: 12px; }
+      .shells-row-mini { transform: scale(1.4); justify-content: center; margin: 1vh 0; }
+      .vault-tokens-inline { transform: scale(1.4); justify-content: center; border: none; background: transparent; padding: 0; }
+      
+      /* Big Results & Timer */
+      .timer-result-bar { padding: 2.5vh 2vw; margin-bottom: 0; flex-direction: column-reverse; gap: 1.5vh; align-items: center; }
+      .result-mini { font-size: 4rem; min-width: auto; }
+      .tip-timer-col { width: 100%; align-items: center; }
+      .tip-text { font-size: 0.95rem; white-space: normal; line-height: 1.5; text-align: center; }
+      
+      /* Stats Alignment */
+      .stats-bar { flex-direction: column; gap: 1.5vh; font-size: 0.95rem; padding: 2vh; align-items: center; }
+      .turn-badge-mini { font-size: 1.2rem; }
+      
+      .extra-box { margin-top: auto; } /* Pushes prediction box to the bottom */
+    }
   </style>
 </head>
 <body>
