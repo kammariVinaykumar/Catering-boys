@@ -51,25 +51,38 @@
     }
 
     /* 1. Timer & Result (Nearest to Board) */
-    .timer-result-bar { display: flex; align-items: center; justify-content: space-between; gap: 10px; background: rgba(0,0,0,0.25); padding: 4px 10px; border-radius: 8px; margin-bottom: 6px; }
-    .tip-timer-col { display: flex; flex-direction: column; flex: 1; gap: 4px; }
-    .tip-text { font-size: 11px; color: var(--text-muted); font-style: italic; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left; }
+    .timer-result-bar { display: flex; align-items: center; justify-content: space-between; gap: 10px; background: rgba(0,0,0,0.25); padding: 6px 10px; border-radius: 8px; margin-bottom: 6px; min-height: 38px; }
+    .tip-timer-col { display: flex; flex-direction: column; flex: 1; justify-content: center; }
+    .tip-text { font-size: 11px; color: var(--text-muted); font-style: italic; white-space: normal; line-height: 1.3; text-align: left; }
     .tip-text.warn { color: #f97316; } .tip-text.danger { color: #ef4444; } .tip-text.good { color: #4ade80; }
-    .timer-track-mini { width: 100%; height: 6px; background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden; }
-    .timer-fill { height: 100%; width: 0%; transition: width 0.1s linear; }
-    .timer-fill.red-fill { background: linear-gradient(90deg, #dc2626, #f87171); }
-    .timer-fill.blue-fill { background: linear-gradient(90deg, #1d4ed8, #60a5fa); }
-    .result-mini { font-size: 26px; font-weight: 900; color: var(--gold); min-width: 32px; text-align: center; text-shadow: 0 0 15px rgba(245,158,11,0.6); }
+    .result-mini { font-size: 26px; font-weight: 900; color: var(--gold); min-width: 32px; text-align: center; text-shadow: 0 0 15px rgba(245,158,11,0.6); line-height: 1; }
 
     /* 2. Action Bar (Roll + Shells + Coins inline) */
     .action-bar { display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-bottom: 6px; }
-    .roll-btn-mini { flex: 1; max-width: 90px; padding: 10px 0; font-size: 13px; font-weight: 800; color: #1c0a00; background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 60%, #d97706 100%); border: none; border-radius: 8px; box-shadow: 0 4px 10px rgba(245,158,11,0.4), inset 0 2px 0 rgba(255,255,255,0.3); outline: none; cursor: pointer; transition: transform 0.1s; }
-    .roll-btn-mini:hover:not(:disabled) { transform: translateY(-2px); }
+    
+    /* NEW: Timer around the button */
+    .roll-btn-wrap {
+      position: relative; flex: 1; max-width: 140px; padding: 4px;
+      background: #1a0f06; border-radius: 12px; overflow: hidden;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: inset 0 0 8px rgba(0,0,0,0.8);
+    }
+    .timer-bg {
+      position: absolute; top: 0; left: 0; bottom: 0; width: 0%;
+      transition: width 0.1s linear; z-index: 0; border-radius: 8px;
+    }
+    .timer-bg.red-fill { background: linear-gradient(90deg, #dc2626, #ef4444); box-shadow: 0 0 10px #ef4444; }
+    .timer-bg.blue-fill { background: linear-gradient(90deg, #1d4ed8, #3b82f6); box-shadow: 0 0 10px #3b82f6; }
+
+    .roll-btn-mini { position: relative; z-index: 1; width: 100%; padding: 10px 0; font-size: 13px; font-weight: 800; color: #1c0a00; background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 60%, #d97706 100%); border: none; border-radius: 8px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.4); outline: none; cursor: pointer; transition: transform 0.1s; }
+    .roll-btn-mini:hover:not(:disabled) { transform: translateY(-1px); }
     .roll-btn-mini:active:not(:disabled) { transform: translateY(1px); }
     .roll-btn-mini:disabled { background: #3d2a15; color: #6b4c2a; box-shadow: none; }
+    
     .shells-row-mini { display: flex; gap: 3px; flex-shrink: 0; }
     .shell-el { width: 24px; height: 18px; border-radius: 50% 50% 40% 40%; border: 1.5px solid #8b6340; display: flex; align-items: center; justify-content: center; font-size: 11px; background: #fef9f0; color: #000; transition: all 0.2s; }
     .shell-el.down { background: #a07850; color: #fef9f0; transform: rotateX(180deg); font-size: 9px; }
+    
     .vault-tokens-inline { display: flex; gap: 4px; background: rgba(0,0,0,0.3); padding: 4px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.05); align-items: center; }
     .vault-tokens-inline .token { width: 22px; height: 22px; font-size: 0; border-width: 1.5px; margin: 0; }
 
@@ -91,9 +104,19 @@
     .extra-box { margin-top: 6px; background: rgba(0,0,0,0.25); border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); overflow: hidden; }
     .col-header { font-size: 10px; font-weight: 700; color: var(--text-muted); padding: 6px 12px; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
     .col-content { padding: 8px; border-top: 1px solid rgba(255,255,255,0.03); }
+    
     .meter-track { height: 14px; background: rgba(255,255,255,0.05); border-radius: 7px; display: flex; overflow: hidden; }
     .meter-red { background: linear-gradient(90deg, #b91c1c, #ef4444); height: 100%; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; color: white; transition: width 0.6s ease; }
     .meter-blue { background: linear-gradient(90deg, #3b82f6, #1d4ed8); height: 100%; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; color: white; transition: width 0.6s ease; }
+
+    /* History Styles */
+    .hist-body { display: flex; flex-wrap: wrap; gap: 5px; max-height: 80px; overflow-y: auto; justify-content: center; }
+    .hist-body::-webkit-scrollbar { width: 3px; }
+    .hist-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+    .hist-badge { width: 24px; height: 24px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; animation: pop-in 0.25s ease-out; }
+    .hist-r { background: rgba(239,68,68,0.25); color: #f87171; border: 1px solid rgba(239,68,68,0.3); }
+    .hist-b { background: rgba(59,130,246,0.25); color: #60a5fa; border: 1px solid rgba(59,130,246,0.3); }
+    @keyframes pop-in { 0% { transform: scale(0); } 100% { transform: scale(1); } }
 
     /* ===== BOARD SCALING (PERFECT FIT) ===== */
     .center-col { display: flex; flex: 1; align-items: center; justify-content: center; width: 100%; min-height: 0; padding: 4px 0; }
@@ -157,38 +180,48 @@
     /* ===== LAPTOP / DESKTOP VIEW (ONLY DESIGN CHANGES) ===== */
     @media (min-width: 801px) {
       body { padding: 3vh 2vw; }
-      .game-wrap { flex-direction: row; max-width: 1400px; justify-content: center; align-items: stretch; gap: 4vw; }
+      .game-wrap { flex-direction: row; max-width: 1600px; justify-content: center; align-items: stretch; gap: 4vw; height: 92vh; }
       
       /* Reorder Panels to Left & Right */
       .blue-panel { transform: none; order: 1; }
-      .center-col { order: 2; flex: 1; max-width: min(600px, 75vh); display: flex; align-items: center; justify-content: center; }
+      .center-col { order: 2; flex: 1; display: flex; align-items: center; justify-content: center; height: 100%; }
       .red-panel { order: 3; }
       
-      /* Make Panels Spacious */
-      .player-panel { width: 340px; max-width: 25vw; padding: 3vh 2vw; justify-content: flex-start; gap: 2vh; }
+      /* Reduced Panel Size & Spacing for Laptop */
+      .player-panel { width: 280px; max-width: 24vw; padding: 3vh 1.5vw; justify-content: center; gap: 2.5vh; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.6); }
       
-      /* Giant Board */
-      .board-wrap { max-height: none; width: 100%; height: auto; aspect-ratio: 1; }
-      .board { max-height: none; padding: 12px; border-width: 4px; border-radius: 18px; }
-      .cell { border-radius: 14%; }
+      /* Giant Board that scales with height */
+      .board-wrap { max-height: none; width: 100%; height: auto; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; }
+      .board { max-height: none; width: 100%; height: 100%; padding: 18px; border-width: 5px; border-radius: 22px; }
+      .cell { border-radius: 14%; border-width: 2px; }
       
       /* Clean Dashboard Layout for Actions */
-      .action-bar { flex-direction: column; gap: 2.5vh; background: rgba(0,0,0,0.2); padding: 2.5vh 2vw; border-radius: 14px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 0; }
-      .roll-btn-mini { max-width: 100%; padding: 1.5vh 0; font-size: 1.2rem; border-radius: 12px; }
-      .shells-row-mini { transform: scale(1.4); justify-content: center; margin: 1vh 0; }
-      .vault-tokens-inline { transform: scale(1.4); justify-content: center; border: none; background: transparent; padding: 0; }
+      .action-bar { flex-direction: column; gap: 2.5vh; background: rgba(0,0,0,0.25); padding: 2.5vh 1.5vw; border-radius: 16px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 0; }
+      
+      /* Timer Wrapper Styling for Laptop */
+      .roll-btn-wrap { max-width: 100%; width: 100%; padding: 6px; border-radius: 16px; }
+      .roll-btn-mini { padding: 1.5vh 0; font-size: 1.2rem; border-radius: 12px; }
+      .timer-bg { border-radius: 14px; }
+      
+      .shells-row-mini { transform: scale(1.6); justify-content: center; margin: 1.5vh 0; }
+      .vault-tokens-inline { transform: scale(1.4); justify-content: center; border: none; background: transparent; padding: 0; min-height: 28px; }
       
       /* Big Results & Timer */
-      .timer-result-bar { padding: 2.5vh 2vw; margin-bottom: 0; flex-direction: column-reverse; gap: 1.5vh; align-items: center; }
-      .result-mini { font-size: 4rem; min-width: auto; }
+      .timer-result-bar { padding: 0; margin-bottom: 0; flex-direction: column-reverse; gap: 2vh; align-items: center; background: transparent; }
+      .result-mini { font-size: 4.5rem; min-width: auto; }
       .tip-timer-col { width: 100%; align-items: center; }
-      .tip-text { font-size: 0.95rem; white-space: normal; line-height: 1.5; text-align: center; }
+      .tip-text { font-size: 1.05rem; white-space: normal; line-height: 1.5; text-align: center; min-height: 3rem; }
       
       /* Stats Alignment */
-      .stats-bar { flex-direction: column; gap: 1.5vh; font-size: 0.95rem; padding: 2vh; align-items: center; }
-      .turn-badge-mini { font-size: 1.2rem; }
+      .stats-bar { flex-direction: column; gap: 1.5vh; font-size: 1.05rem; padding: 2vh; align-items: center; background: rgba(255,255,255,0.02); border-radius: 12px; }
+      .turn-badge-mini { font-size: 1.3rem; }
+      .turn-dot { width: 12px; height: 12px; }
       
-      .extra-box { margin-top: auto; } /* Pushes prediction box to the bottom */
+      /* Force display Prediction and History on Laptop */
+      .extra-box { margin-top: auto; }
+      #pred-body { display: block !important; }
+      #hist-body { display: flex !important; }
+      #pred-arrow, #hist-arrow { display: none; }
     }
   </style>
 </head>
@@ -225,18 +258,21 @@
     <!-- P2 CONTROLS (BLUE) - TOP OF SCREEN, ROTATED 180 DEG -->
     <div class="player-panel blue-panel" id="p2-panel">
       
-      <!-- 1. Timer & Result (Visually nearest to Board) -->
+      <!-- 1. Result & Info -->
       <div class="timer-result-bar">
         <div class="tip-timer-col">
           <div class="tip-text" id="p2-tip">ఆట ప్రారంభించండి...</div>
-          <div class="timer-track-mini"><div class="timer-fill blue-fill" id="p2-timer-fill"></div></div>
         </div>
         <div class="result-mini" id="p2-result-num">—</div>
       </div>
 
-      <!-- 2. Action Bar (Roll, Shells, Vault Coins - Inline) -->
+      <!-- 2. Action Bar (Roll, Shells, Vault Coins) -->
       <div class="action-bar">
-        <button class="roll-btn-mini" id="p2-roll-btn" onclick="rollGavvalu(2)" disabled>🎲 గవ్వలు(5)</button>
+        <!-- New Timer Wrapped Roll Button -->
+        <div class="roll-btn-wrap">
+          <div class="timer-bg blue-fill" id="p2-timer-fill"></div>
+          <button class="roll-btn-mini" id="p2-roll-btn" onclick="rollGavvalu(2)" disabled>🎲 గవ్వలు(5)</button>
+        </div>
         <div class="shells-row-mini">
           <div class="shell-el" id="p2-s0">🐚</div><div class="shell-el" id="p2-s1">🐚</div>
           <div class="shell-el" id="p2-s2">🐚</div><div class="shell-el" id="p2-s3">🐚</div>
@@ -250,6 +286,14 @@
         <div class="stats-group">
           కిల్స్: <span id="p2-kills">0</span> | పర్మిషన్: <span id="p2-perm">❌</span> | 
           <div class="strikes-row" id="p2-strikes"></div>
+        </div>
+      </div>
+      
+      <!-- 4. Extra: History (For Blue Panel) -->
+      <div class="extra-box">
+        <div class="col-header" onclick="toggleHist()">📜 రోల్ హిస్టరీ <span id="hist-arrow">▼</span></div>
+        <div class="col-content hist-body" id="hist-body" style="display:none;">
+           <!-- History badges will appear here -->
         </div>
       </div>
 
@@ -267,18 +311,21 @@
     <!-- P1 CONTROLS (RED) - BOTTOM OF SCREEN -->
     <div class="player-panel red-panel" id="p1-panel">
       
-      <!-- 1. Timer & Result (Visually nearest to Board) -->
+      <!-- 1. Result & Info -->
       <div class="timer-result-bar">
         <div class="tip-timer-col">
           <div class="tip-text" id="p1-tip">ఆట ప్రారంభించండి...</div>
-          <div class="timer-track-mini"><div class="timer-fill red-fill" id="p1-timer-fill"></div></div>
         </div>
         <div class="result-mini" id="p1-result-num">—</div>
       </div>
 
-      <!-- 2. Action Bar (Roll, Shells, Vault Coins - Inline) -->
+      <!-- 2. Action Bar (Roll, Shells, Vault Coins) -->
       <div class="action-bar">
-        <button class="roll-btn-mini" id="p1-roll-btn" onclick="rollGavvalu(1)">🎲 గవ్వలు(5)</button>
+        <!-- New Timer Wrapped Roll Button -->
+        <div class="roll-btn-wrap">
+          <div class="timer-bg red-fill" id="p1-timer-fill"></div>
+          <button class="roll-btn-mini" id="p1-roll-btn" onclick="rollGavvalu(1)">🎲 గవ్వలు(5)</button>
+        </div>
         <div class="shells-row-mini">
           <div class="shell-el" id="p1-s0">🐚</div><div class="shell-el" id="p1-s1">🐚</div>
           <div class="shell-el" id="p1-s2">🐚</div><div class="shell-el" id="p1-s3">🐚</div>
@@ -295,7 +342,7 @@
         </div>
       </div>
 
-      <!-- 4. Extra: Prediction (Visually at the outer edge of screen) -->
+      <!-- 4. Extra: Prediction (For Red Panel) -->
       <div class="extra-box">
         <div class="col-header" onclick="togglePred()">📊 గెలుపు అంచనా (Prediction) <span id="pred-arrow">▼</span></div>
         <div class="col-content" id="pred-body" style="display:none;">
@@ -350,11 +397,14 @@
     function updKeySel(){ curMovEls.forEach((e,i)=>e.classList.toggle('key-selected',i===selMovIdx)); }
     
     let predOpen = false;
+    let histOpen = false;
     function togglePred() { predOpen = !predOpen; document.getElementById('pred-body').style.display = predOpen ? 'block' : 'none'; document.getElementById('pred-arrow').textContent = predOpen ? '▲' : '▼'; }
+    function toggleHist() { histOpen = !histOpen; document.getElementById('hist-body').style.display = histOpen ? 'flex' : 'none'; document.getElementById('hist-arrow').textContent = histOpen ? '▲' : '▼'; }
 
     function restartGame() {
         G = getInitialState(); clearGameState();
         document.getElementById('restart-screen').style.display = 'none';
+        document.getElementById('hist-body').innerHTML = '';
         removePortal(); removeRedhole(); updateStrikeDisplay(); resetRoll();
     }
     
@@ -467,7 +517,27 @@
 
     function getCellEl(coord) { if (!coord) return null; return document.getElementById(`c-${coord.replace(',','-')}`); }
     function hasPerm(p) { return p===1 ? (G.p1Kills>0||G.p1PortalUsed) : (G.p2Kills>0||G.p2PortalUsed); }
-    function setDualTip(text, type='') { const cls = 'tip-text' + (type ? ` ${type}` : ''); const t1 = document.getElementById('p1-tip'); t1.textContent = text; t1.className = cls; const t2 = document.getElementById('p2-tip'); t2.textContent = text; t2.className = cls; }
+    
+    function setDualTip(text, type='', activeP=0) { 
+        const cls = 'tip-text' + (type ? ` ${type}` : ''); 
+        const t1 = document.getElementById('p1-tip'); 
+        const t2 = document.getElementById('p2-tip'); 
+        
+        /* Laptop View: Show instruction only to active player, and 'Waiting' to the other */
+        if (G.device === 'laptop' && activeP !== 0) {
+            if (activeP === 1) {
+                t1.textContent = text; t1.className = cls;
+                t2.textContent = 'RED ఆడుతున్నారు... ⏳'; t2.className = 'tip-text dim';
+            } else {
+                t2.textContent = text; t2.className = cls;
+                t1.textContent = 'BLUE ఆడుతున్నారు... ⏳'; t1.className = 'tip-text dim';
+            }
+        } else {
+            t1.textContent = text; t1.className = cls; 
+            t2.textContent = text; t2.className = cls; 
+        }
+    }
+
     function flashBoard(cls) { boardEl.classList.add(cls); setTimeout(()=>boardEl.classList.remove(cls), 1100); }
     function showEvent(main, sub='', dur=2200) { const bann = document.getElementById('ev-banner'); document.getElementById('ev-main').textContent = main; document.getElementById('ev-sub').textContent = sub; bann.classList.add('show'); setTimeout(()=>bann.classList.remove('show'), dur); }
     function sparkle(c) { const cell = getCellEl(c); if (!cell) return; const s = document.createElement('div'); s.className = 'sparkle'; cell.appendChild(s); setTimeout(()=>s.remove(), 500); }
@@ -493,16 +563,25 @@
       else if (p===2&&G.p2BonusPending) { if (p2sum<p1sum) final=boostedRoll(base); G.p2BonusPending=false; }
       G.extraTurn = (final===12); G.currentRoll = final; G.hasRolled = true; document.getElementById(`p${p}-result-num`).textContent = final;
       
+      // Update History Box
+      const hb = document.getElementById('hist-body');
+      if (hb) {
+          const badge = document.createElement('div');
+          badge.className = `hist-badge hist-${p===1?'r':'b'}`;
+          badge.textContent = final;
+          hb.prepend(badge);
+      }
+      
       const vaultT = p===1?G.p1Tokens:G.p2Tokens; const vaultIdxs = vaultT.reduce((a,v,i)=>v===-1?[...a,i]:a,[]); const hasBoard = vaultT.some(p=>p!==-1&&p<p1Path.length-1);
-      if (final===12 && vaultIdxs.length>=2 && !hasBoard) { setDualTip('💥 12 పడింది! 2 కాయిన్స్ రిలీజ్', 'good'); setTimeout(()=>doReleaseTwoVault(p, vaultIdxs[0], vaultIdxs[1]), 900); return; }
-      if (final===12 && vaultIdxs.length===1 && !hasBoard) { setDualTip('💥 12 పడింది! 1 కాయిన్ +6 స్టెప్స్', 'good'); setTimeout(()=>doReleaseAndSix(p, vaultIdxs[0]), 900); return; }
-      if (final===6 && vaultIdxs.length>0 && !hasBoard) { setDualTip('💥 6 పడింది! కాయిన్ రిలీజ్', 'good'); setTimeout(()=>doReleaseOne(p, vaultIdxs[0]), 900); return; }
+      if (final===12 && vaultIdxs.length>=2 && !hasBoard) { setDualTip('💥 12 పడింది! 2 కాయిన్స్ రిలీజ్', 'good', p); setTimeout(()=>doReleaseTwoVault(p, vaultIdxs[0], vaultIdxs[1]), 900); return; }
+      if (final===12 && vaultIdxs.length===1 && !hasBoard) { setDualTip('💥 12 పడింది! 1 కాయిన్ +6 స్టెప్స్', 'good', p); setTimeout(()=>doReleaseAndSix(p, vaultIdxs[0]), 900); return; }
+      if (final===6 && vaultIdxs.length>0 && !hasBoard) { setDualTip('💥 6 పడింది! కాయిన్ రిలీజ్', 'good', p); setTimeout(()=>doReleaseOne(p, vaultIdxs[0]), 900); return; }
       const movable = getMovable(final); const canRelease = (final===6||final===12) && vaultIdxs.length>0;
-      if (!movable.length && !canRelease) { setDualTip('మూవ్ చేయలేం! టర్న్ స్కిప్', ''); setTimeout(()=>switchTurn(true), 1100); }
-      else if (movable.length===1 && !canRelease) { setDualTip('ఆటోమేటిక్ మూవ్...', ''); setTimeout(()=>moveToken(p, movable[0].idx), 900); }
+      if (!movable.length && !canRelease) { setDualTip('మూవ్ చేయలేం! టర్న్ స్కిప్', '', p); setTimeout(()=>switchTurn(true), 1100); }
+      else if (movable.length===1 && !canRelease) { setDualTip('ఆటోమేటిక్ మూవ్...', '', p); setTimeout(()=>moveToken(p, movable[0].idx), 900); }
       else { 
         let tipText = G.device === 'laptop' ? 'కాయిన్ సెలెక్ట్ చేయండి ("0" నొక్కండి)' : 'కాయిన్ సెలెక్ట్ చేయండి (టచ్ చేయండి)';
-        setDualTip(tipText, ''); updateBoard(); startTimer(); 
+        setDualTip(tipText, '', p); updateBoard(); startTimer(); 
       }
     }
 
@@ -545,7 +624,7 @@
     }
     function validateShield() { const {player:p, idx:i} = G.shielded; if (p===null) return; const pos = p===1?G.p1Tokens[i]:G.p2Tokens[i]; if (pos<41||pos>46) G.shielded={player:null,idx:null}; }
 
-    function switchTurn() { if (G.isGameOver) return; G.currentPlayer = G.currentPlayer===1?2:1; G.hasRolled = false; G.currentRoll = 0; resetRoll(); }
+    function switchTurn(noMove) { if (G.isGameOver) return; G.currentPlayer = G.currentPlayer===1?2:1; G.hasRolled = false; G.currentRoll = 0; resetRoll(); }
     function resetRoll() {
       if (G.isGameOver) return; const p = G.currentPlayer;
       document.getElementById('p1-roll-btn').disabled = (p !== 1); document.getElementById('p2-roll-btn').disabled = (p !== 2);
@@ -567,7 +646,7 @@
       
       let tipText = `${p===1?'RED':'BLUE'} వంతు... గవ్వలు వేయండి`;
       tipText += G.device === 'laptop' ? ' ("5" నొక్కండి)' : '';
-      setDualTip(tipText, ''); updateBoard(); startTimer();
+      setDualTip(tipText, '', p); updateBoard(); startTimer();
     }
 
     function updateBoard() {
@@ -672,11 +751,11 @@
         });
         if (G.hasRolled) { 
             let tipText = G.device === 'laptop' ? 'కాయిన్ సెలెక్ట్ చేయండి ("0" నొక్కండి)' : 'కాయిన్ సెలెక్ట్ చేయండి (టచ్ చేయండి)';
-            setDualTip(tipText, ''); 
+            setDualTip(tipText, '', p); 
         } else { 
             let tipText = `${p===1?'RED':'BLUE'} వంతు... గవ్వలు వేయండి`;
             tipText += G.device === 'laptop' ? ' ("5" నొక్కండి)' : '';
-            setDualTip(tipText, ''); 
+            setDualTip(tipText, '', p); 
         }
         document.getElementById('main-game').style.display = 'flex';
         updateStrikeDisplay(); updateBoard(); startTimer();
