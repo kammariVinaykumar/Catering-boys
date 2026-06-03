@@ -215,11 +215,18 @@ document.getElementById('b-owner-enter').onclick   = ()=>{
     document.getElementById('o-phone').value = ph;
     show('s-owner');
     loadOwnerFeed();
+    startOwnerAutoRefresh();
 };
 
 // Owner panel
-document.getElementById('bk-owner').onclick      = ()=>show('s-home');
-document.getElementById('b-post-cancel').onclick  = ()=>show('s-home');
+document.getElementById('bk-owner').onclick      = ()=>{ 
+    if(window._ownerTimer) clearInterval(window._ownerTimer);
+    show('s-home'); 
+};
+document.getElementById('b-post-cancel').onclick  = ()=>{ 
+    if(window._ownerTimer) clearInterval(window._ownerTimer);
+    show('s-home'); 
+};
 document.getElementById('b-post').onclick         = postWork;
 document.getElementById('o-type').onchange        = function(){
     document.getElementById('o-other').style.display = this.value==='Others'?'block':'none';
@@ -272,6 +279,11 @@ async function postWork(){
 }
 
 // ── Owner Feed (only this owner's posts) ───────────────────
+function startOwnerAutoRefresh(){
+    if(window._ownerTimer) clearInterval(window._ownerTimer);
+    window._ownerTimer = setInterval(loadOwnerFeed, 10000);
+}
+
 async function loadOwnerFeed(){
     const feed = document.getElementById('owner-feed');
     feed.innerHTML='<div class="loading">Loading...</div>';
@@ -289,12 +301,13 @@ async function loadOwnerFeed(){
             </div>
             <div class="det">👷 ${data.Needed} workers &nbsp;|&nbsp; 💰 ₹${data.Budget}</div>
             <div class="det" style="font-size:11px;color:var(--gray)">🆔 ${d.id}</div>
+            ${data.Status !== 'approved' ? `
             <div class="hr"></div>
             <div style="font-size:11px;font-weight:600;color:var(--gray);margin-bottom:6px">UPDATE BUDGET</div>
             <div class="brow">
                 <input type="number" id="b-${d.id}" value="${data.Budget}" placeholder="New budget ₹">
                 <button onclick="updateBudget('${d.id}','${data.OwnerName}','${data.OwnerPhone}','${data.Type}')">Update</button>
-            </div>
+            </div>` : ''}
         </div>`;
     });
     feed.innerHTML = html||'<div class="empty"><div class="em">📭</div><p>No posts yet.</p></div>';
