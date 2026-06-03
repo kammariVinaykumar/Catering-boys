@@ -15,75 +15,76 @@
     
     /* ===== FIXED SCREEN LOCK ===== */
     html, body {
-      margin: 0; padding: 0; width: 100vw; height: 100dvh; /* 100dvh ensures mobile browsers don't hide bottom */
-      overflow: hidden; /* No scrolling */
-      touch-action: none; /* Prevents pull-to-refresh & swipe gestures */
-      background: #0a0502; font-family: 'Arial', sans-serif; color: var(--text-light); user-select: none;
+      margin: 0; padding: 0; width: 100vw; height: 100dvh;
+      overflow: hidden; touch-action: none; background: #0a0502;
+      font-family: 'Arial', sans-serif; color: var(--text-light); user-select: none;
     }
     body {
       display: flex; flex-direction: column; align-items: center; justify-content: center;
       background: radial-gradient(ellipse at center, #2d1a08 0%, #0a0502 100%);
-      padding: 4px; box-sizing: border-box;
+      padding: 6px; box-sizing: border-box;
     }
 
-    /* ===== START / RESTART SCREENS ===== */
-    #start-screen, #restart-screen { position: fixed; inset: 0; background: radial-gradient(ellipse at top, #2d1a08 0%, #0f0804 100%); z-index: 2000; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.5s ease; }
+    /* ===== START, RESTART & QUIT SCREENS ===== */
+    #start-screen, #restart-screen, #quit-modal {
+      position: fixed; inset: 0; background: radial-gradient(ellipse at top, #2d1a08 0%, #0f0804 100%);
+      z-index: 2000; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.5s ease;
+    }
+    #quit-modal { background: rgba(10,5,2,0.9); backdrop-filter: blur(5px); z-index: 3000; }
+    
     .game-title { font-size: 42px; color: var(--gold); letter-spacing: 2px; text-shadow: 0 0 30px rgba(245,158,11,0.5); margin-bottom: 4px; text-align: center; }
     .game-subtitle { font-size: 14px; color: var(--text-muted); letter-spacing: 3px; text-transform: uppercase; margin-bottom: 40px; text-align: center; }
+    
     .start-btn {
       padding: 16px 40px; font-size: 22px; font-weight: 900; color: #1c0a00;
       background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%);
       border: 3px solid #fcd34d; border-radius: 40px; cursor: pointer; outline: none;
       box-shadow: 0 10px 30px rgba(245,158,11,0.5), inset 0 4px 0 rgba(255,255,255,0.4);
-      text-transform: uppercase; letter-spacing: 2px; transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+      text-transform: uppercase; letter-spacing: 2px; transition: transform 0.2s;
     }
-    .start-btn:hover { transform: scale(1.05); box-shadow: 0 15px 40px rgba(245,158,11,0.7); }
-    .start-btn:active { transform: scale(0.95); box-shadow: 0 5px 15px rgba(245,158,11,0.4); }
+    .start-btn:active { transform: scale(0.95); }
+    
+    .modal-box { background: var(--panel-card); border: 2px solid var(--panel-border); padding: 30px; border-radius: 16px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.8); }
+    .modal-box h2 { color: var(--gold); margin-bottom: 20px; font-size: 20px; }
+    .modal-btns { display: flex; gap: 15px; justify-content: center; }
+    .btn-yes { background: #ef4444; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+    .btn-no { background: #4b5563; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; }
 
     /* ===== MAIN LAYOUT (FACE TO FACE) ===== */
-    .game-wrap { display: flex; flex-direction: column; justify-content: space-between; width: 100%; max-width: 500px; height: 100%; gap: 4px; }
-    .blue-panel { transform: rotate(180deg); } /* Inverts the top player panel */
+    .game-wrap { display: flex; flex-direction: column; justify-content: space-between; width: 100%; max-width: 500px; height: 100%; gap: 6px; }
+    .blue-panel { transform: rotate(180deg); }
     
     .player-panel {
       display: flex; flex-direction: column; width: 100%; background: var(--panel-card);
-      border: 1px solid var(--panel-border); border-radius: 12px; padding: 4px 8px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.5); flex-shrink: 0; gap: 4px;
+      border: 1px solid var(--panel-border); border-radius: 12px; padding: 6px 10px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5); flex-shrink: 0;
     }
 
-    /* 1. Tip Text (Hidden in Mobile) */
-    .tip-timer-col { display: none; flex-direction: column; align-items: center; justify-content: center; background: rgba(0,0,0,0.25); padding: 8px; border-radius: 8px; }
-    .tip-text { font-size: 11px; color: var(--text-muted); font-style: italic; white-space: normal; line-height: 1.3; text-align: center; }
+    /* 1. Timer & Result */
+    .timer-result-bar { display: none; align-items: center; justify-content: space-between; gap: 10px; background: rgba(0,0,0,0.25); padding: 6px 10px; border-radius: 8px; margin-bottom: 6px; min-height: 38px; }
+    .tip-timer-col { display: none; flex-direction: column; flex: 1; justify-content: center; }
+    .tip-text { font-size: 11px; color: var(--text-muted); font-style: italic; white-space: normal; line-height: 1.3; text-align: left; }
+    .tip-text.dim { opacity: 0.5; }
     .tip-text.warn { color: #f97316; } .tip-text.danger { color: #ef4444; } .tip-text.good { color: #4ade80; }
+    .result-mini { font-size: 26px; font-weight: 900; color: var(--gold); min-width: 32px; text-align: center; text-shadow: 0 0 15px rgba(245,158,11,0.6); line-height: 1; display: none; }
 
-    /* 2. Action Bar (Result + Roll + Shells + Coins inline) */
-    .action-bar { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
-    .result-mini { font-size: 28px; font-weight: 900; color: var(--gold); min-width: 36px; text-align: center; text-shadow: 0 0 15px rgba(245,158,11,0.6); line-height: 1; }
+    /* 2. Action Bar (Roll + Shells + Coins inline) */
+    .action-bar { display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-bottom: 6px; }
     
-    /* ANIMATED BORDER TIMER WRAPPER */
+    /* Animated Circular Timer Border */
     .roll-btn-wrap {
       position: relative; flex: 1; max-width: 140px; padding: 3px;
-      background: transparent; border-radius: 20px;
-      display: flex; align-items: center; justify-content: center;
+      border-radius: 12px; display: flex; align-items: center; justify-content: center;
+      background: #1a0f06; overflow: hidden;
     }
-    
-    /* The spinning animated border */
-    .timer-border {
-      position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-      border-radius: 20px; z-index: 0; pointer-events: none;
+    .timer-bg {
+      position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
       background: conic-gradient(var(--timer-color) var(--timer-deg, 360deg), transparent 0deg);
-      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-      -webkit-mask-composite: xor;
-      mask-composite: exclude;
-      padding: 3px; /* Thickness of the timer border */
-      transition: background 0.1s linear;
+      z-index: 0; transition: --timer-deg 0.1s linear;
     }
-    
-    .timer-border.red-fill { --timer-color: #ef4444; box-shadow: inset 0 0 10px rgba(239,68,68,0.3); }
-    .timer-border.blue-fill { --timer-color: #3b82f6; box-shadow: inset 0 0 10px rgba(59,130,246,0.3); }
+    .roll-btn-wrap::after { content: ''; position: absolute; inset: 3px; background: #1a0f06; border-radius: 9px; z-index: 0; }
 
-    .roll-btn-mini { position: relative; z-index: 1; width: 100%; padding: 10px 0; font-size: 13px; font-weight: 800; color: #1c0a00; background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 60%, #d97706 100%); border: none; border-radius: 17px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.4), 0 2px 5px rgba(0,0,0,0.5); outline: none; cursor: pointer; transition: transform 0.1s; }
-    .roll-btn-mini:hover:not(:disabled) { transform: translateY(-1px); }
-    .roll-btn-mini:active:not(:disabled) { transform: translateY(1px); }
+    .roll-btn-mini { position: relative; z-index: 1; width: 100%; padding: 10px 0; font-size: 13px; font-weight: 800; color: #1c0a00; background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 60%, #d97706 100%); border: none; border-radius: 8px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.4); outline: none; cursor: pointer; transition: transform 0.1s; }
     .roll-btn-mini:disabled { background: #3d2a15; color: #6b4c2a; box-shadow: none; }
     
     .shells-row-mini { display: flex; gap: 3px; flex-shrink: 0; }
@@ -94,7 +95,7 @@
     .vault-tokens-inline .token { width: 22px; height: 22px; font-size: 0; border-width: 1.5px; margin: 0; }
 
     /* 3. Stats Bar (Turn & Details) */
-    .stats-bar { display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: var(--text-muted); background: rgba(255,255,255,0.02); padding: 4px 6px; border-radius: 6px; }
+    .stats-bar { display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: var(--text-muted); background: rgba(255,255,255,0.02); padding: 6px 8px; border-radius: 6px; }
     .turn-badge-mini { display: flex; align-items: center; gap: 6px; font-weight: 700; font-size: 12px; }
     .turn-dot { width: 10px; height: 10px; border-radius: 50%; }
     .turn-dot.red { background: #ef4444; box-shadow: 0 0 10px #ef4444; }
@@ -107,14 +108,17 @@
     .strikes-row { display: flex; align-items: center; gap: 2px; }
     .strike-icon { font-size: 10px; color: #555; } .strike-icon.used { color: #ef4444; }
 
-    /* 4. Extra Box (Hidden in Mobile completely) */
-    .extra-box { display: none; margin-top: 6px; background: rgba(0,0,0,0.25); border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); overflow: hidden; }
+    /* 4. Extra Box (Prediction & Quit visible, History hidden on mobile) */
+    .extra-box { margin-top: 6px; background: rgba(0,0,0,0.25); border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); overflow: hidden; }
+    #blue-extra-box { display: none; }
     .col-header { font-size: 10px; font-weight: 700; color: var(--text-muted); padding: 6px 12px; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
     .col-content { padding: 8px; border-top: 1px solid rgba(255,255,255,0.03); }
     
     .meter-track { height: 14px; background: rgba(255,255,255,0.05); border-radius: 7px; display: flex; overflow: hidden; }
     .meter-red { background: linear-gradient(90deg, #b91c1c, #ef4444); height: 100%; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; color: white; transition: width 0.6s ease; }
     .meter-blue { background: linear-gradient(90deg, #3b82f6, #1d4ed8); height: 100%; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; color: white; transition: width 0.6s ease; }
+    
+    .quit-mini-btn { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.4); padding: 4px 8px; border-radius: 6px; font-size: 9px; font-weight: bold; cursor: pointer; }
 
     /* History Styles */
     .hist-body { display: flex; flex-wrap: wrap; gap: 5px; max-height: 80px; overflow-y: auto; justify-content: center; }
@@ -126,12 +130,12 @@
     @keyframes pop-in { 0% { transform: scale(0); } 100% { transform: scale(1); } }
 
     /* ===== BOARD SCALING (PERFECT FIT) ===== */
-    .center-col { display: flex; flex: 1; align-items: center; justify-content: center; width: 100%; min-height: 0; padding: 0; }
-    .board-wrap { position: relative; display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; max-height: 58vh; }
+    .center-col { display: flex; flex: 1; align-items: center; justify-content: center; width: 100%; min-height: 0; padding: 4px 0; }
+    .board-wrap { position: relative; display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; max-height: 52vh; }
     .board {
       display: grid; 
       grid-template-columns: repeat(7, 1fr); grid-template-rows: repeat(7, 1fr);
-      height: 100%; max-height: 100vw; aspect-ratio: 1; /* Guarantees square scaling without overflowing! */
+      height: 100%; max-height: 100vw; aspect-ratio: 1;
       gap: 3px; padding: 8px; background: var(--board-bg); border-radius: 14px;
       border: 3px solid var(--board-border); box-shadow: 0 10px 40px rgba(0,0,0,0.8), inset 0 2px 0 rgba(255,200,100,0.1);
       position: relative; box-sizing: border-box;
@@ -184,61 +188,49 @@
     .confetti-piece { position: fixed; top: -12px; width: 8px; height: 10px; z-index: 999; animation: fall linear forwards; border-radius: 2px; }
     @keyframes fall { to { transform: translateY(110vh) rotate(720deg); } }
 
-    /* ===== QUIT BUTTON & MODAL ===== */
-    .quit-btn { position: fixed; top: 10px; right: 10px; transform: none; width: 34px; height: 34px; border-radius: 50%; background: rgba(45,26,10,0.8); border: 2px solid #ef4444; color: #ef4444; font-size: 16px; font-weight: 900; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 999; box-shadow: 0 0 10px rgba(239,68,68,0.4); outline: none; transition: transform 0.2s; backdrop-filter: blur(2px); }
-    .quit-btn:hover { transform: scale(1.1); background: #ef4444; color: #fff; }
-    
-    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 3000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(3px); }
-    .modal-box { background: var(--panel-card); border: 2px solid var(--board-border); border-radius: 16px; padding: 24px; text-align: center; max-width: 300px; box-shadow: 0 0 40px rgba(0,0,0,0.8); }
-    .modal-text { font-size: 16px; color: var(--text-light); margin-bottom: 20px; font-weight: bold; line-height: 1.4; }
-    .modal-btns { display: flex; gap: 12px; justify-content: center; }
-    .modal-btn { padding: 10px 20px; font-size: 14px; font-weight: 700; border-radius: 8px; cursor: pointer; outline: none; border: none; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-    .yes-btn { background: linear-gradient(135deg, #ef4444, #b91c1c); color: white; }
-    .no-btn { background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: white; }
+    /* Custom CSS Property for Timer Animation */
+    @property --timer-deg { syntax: '<angle>'; inherits: false; initial-value: 360deg; }
 
     /* ===== LAPTOP / DESKTOP VIEW (ONLY DESIGN CHANGES) ===== */
     @media (min-width: 801px) {
       body { padding: 3vh 2vw; }
       .game-wrap { flex-direction: row; max-width: 1600px; justify-content: center; align-items: stretch; gap: 4vw; height: 92vh; }
       
-      /* Reorder Panels to Left & Right */
       .blue-panel { transform: none; order: 1; }
       .center-col { order: 2; flex: 1; display: flex; align-items: center; justify-content: center; height: 100%; }
       .red-panel { order: 3; }
       
-      /* Reduced Panel Size & Spacing for Laptop */
       .player-panel { width: 280px; max-width: 24vw; padding: 3vh 1.5vw; justify-content: center; gap: 2.5vh; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.6); }
       
-      /* Giant Board that scales with height */
       .board-wrap { max-height: none; width: 100%; height: auto; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; }
       .board { max-height: none; width: 100%; height: 100%; padding: 18px; border-width: 5px; border-radius: 22px; }
       .cell { border-radius: 14%; border-width: 2px; }
       
-      /* Clean Dashboard Layout for Actions */
       .action-bar { flex-direction: column; gap: 2.5vh; background: rgba(0,0,0,0.25); padding: 2.5vh 1.5vw; border-radius: 16px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 0; }
       
-      /* Display Text and Extra Box in Laptop only */
-      .tip-timer-col { display: flex; margin-bottom: 1.5vh; }
-      .extra-box { display: block; margin-top: auto; }
-      #hist-body { display: flex !important; }
-      
-      /* Timer Wrapper Styling for Laptop */
-      .roll-btn-wrap { max-width: 100%; width: 100%; padding: 4px; border-radius: 20px; }
-      .roll-btn-mini { padding: 1.5vh 0; font-size: 1.2rem; border-radius: 17px; }
+      .roll-btn-wrap { max-width: 100%; width: 100%; padding: 4px; border-radius: 16px; }
+      .roll-btn-wrap::after { border-radius: 13px; inset: 4px; }
+      .roll-btn-mini { padding: 1.5vh 0; font-size: 1.2rem; border-radius: 12px; }
       
       .shells-row-mini { transform: scale(1.6); justify-content: center; margin: 1.5vh 0; }
       .vault-tokens-inline { transform: scale(1.4); justify-content: center; border: none; background: transparent; padding: 0; min-height: 28px; }
       
-      /* Big Results */
-      .result-mini { font-size: 4rem; min-width: auto; margin-bottom: 10px; }
+      /* Display Text and Extra Box in Laptop only */
+      .timer-result-bar { display: flex; padding: 0; margin-bottom: 0; flex-direction: column-reverse; gap: 2vh; align-items: center; background: transparent; }
+      .tip-timer-col { display: flex; width: 100%; align-items: center; }
+      .result-mini { display: block; font-size: 4.5rem; min-width: auto; }
+      .tip-text { font-size: 1.05rem; white-space: normal; line-height: 1.5; text-align: center; min-height: 3rem; }
+      
+      .stats-bar { flex-direction: column; gap: 1.5vh; font-size: 1.05rem; padding: 2vh; align-items: center; background: rgba(255,255,255,0.02); border-radius: 12px; }
+      .turn-badge-mini { font-size: 1.3rem; }
+      .turn-dot { width: 12px; height: 12px; }
+      
       /* Force display Prediction and History on Laptop */
       .extra-box { margin-top: auto; }
+      #blue-extra-box { display: block; }
       #pred-body { display: block !important; }
       #hist-body { display: flex !important; }
       #pred-arrow, #hist-arrow { display: none; }
-      
-      .quit-btn { top: 20px; right: 20px; transform: none; width: 44px; height: 44px; font-size: 20px; }
-      .quit-btn:hover { transform: scale(1.1); }
     }
   </style>
 </head>
@@ -268,6 +260,17 @@
     <p class="game-subtitle" id="rs-sub" style="color:var(--gold); margin-bottom: 30px;">Result</p>
     <button class="start-btn" onclick="restartGame()">Restart Game</button>
   </div>
+  
+  <!-- QUIT MODAL -->
+  <div id="quit-modal" style="display:none;">
+    <div class="modal-box">
+        <h2>ఆట నుండి బయటకు రావాలా?</h2>
+        <div class="modal-btns">
+            <button class="btn-yes" onclick="confirmQuit()">అవును, ఆపేస్తాను</button>
+            <button class="btn-no" onclick="closeQuitModal()">వద్దు, కంటిన్యూ</button>
+        </div>
+    </div>
+  </div>
 
   <!-- MAIN GAME UI (FACE-TO-FACE LAYOUT) -->
   <div class="game-wrap" id="main-game" style="display:none;">
@@ -275,21 +278,20 @@
     <!-- P2 CONTROLS (BLUE) - TOP OF SCREEN, ROTATED 180 DEG -->
     <div class="player-panel blue-panel" id="p2-panel">
       
-      <!-- Info (Visible only in Laptop) -->
-      <div class="tip-timer-col" id="p2-tip-wrap">
-        <div class="tip-text" id="p2-tip">ఆట ప్రారంభించండి...</div>
+      <!-- 1. Result & Info (Hidden in Mobile) -->
+      <div class="timer-result-bar">
+        <div class="tip-timer-col">
+          <div class="tip-text" id="p2-tip">ఆట ప్రారంభించండి...</div>
+        </div>
+        <div class="result-mini" id="p2-result-num">—</div>
       </div>
 
-      <!-- Action Bar (Result, Roll, Shells, Vault Coins) -->
+      <!-- 2. Action Bar (Roll, Shells, Vault Coins) -->
       <div class="action-bar">
-        <div class="result-mini" id="p2-result-num">—</div>
-        
-        <!-- Animated Border Timer Wrapper -->
-        <div class="roll-btn-wrap">
-          <div class="timer-border blue-fill" id="p2-timer-border"></div>
+        <div class="roll-btn-wrap" id="p2-timer-wrap">
+          <div class="timer-bg" id="p2-timer-fill" style="--timer-color: #3b82f6;"></div>
           <button class="roll-btn-mini" id="p2-roll-btn" onclick="rollGavvalu(2)" disabled>🎲 గవ్వలు(5)</button>
         </div>
-        
         <div class="shells-row-mini">
           <div class="shell-el" id="p2-s0">🐚</div><div class="shell-el" id="p2-s1">🐚</div>
           <div class="shell-el" id="p2-s2">🐚</div><div class="shell-el" id="p2-s3">🐚</div>
@@ -297,7 +299,7 @@
         <div class="vault-tokens-inline" id="p2-vault-tokens"></div>
       </div>
 
-      <!-- Stats & Turn Info -->
+      <!-- 3. Stats & Turn Info -->
       <div class="stats-bar">
         <div class="turn-badge-mini"><div class="turn-dot dim" id="p2-dot"></div><span class="turn-label dim" id="p2-label">BLUE వంతు</span></div>
         <div class="stats-group">
@@ -307,7 +309,7 @@
       </div>
       
       <!-- Extra: History (Hidden in Mobile) -->
-      <div class="extra-box">
+      <div class="extra-box" id="blue-extra-box">
         <div class="col-header" onclick="toggleHist()">📜 రోల్ హిస్టరీ <span id="hist-arrow">▼</span></div>
         <div class="col-content hist-body" id="hist-body">
            <!-- History badges will appear here -->
@@ -328,21 +330,20 @@
     <!-- P1 CONTROLS (RED) - BOTTOM OF SCREEN -->
     <div class="player-panel red-panel" id="p1-panel">
       
-      <!-- Info (Visible only in Laptop) -->
-      <div class="tip-timer-col" id="p1-tip-wrap">
-        <div class="tip-text" id="p1-tip">ఆట ప్రారంభించండి...</div>
+      <!-- 1. Result & Info (Hidden in Mobile) -->
+      <div class="timer-result-bar">
+        <div class="tip-timer-col">
+          <div class="tip-text" id="p1-tip">ఆట ప్రారంభించండి...</div>
+        </div>
+        <div class="result-mini" id="p1-result-num">—</div>
       </div>
 
-      <!-- Action Bar (Result, Roll, Shells, Vault Coins) -->
+      <!-- 2. Action Bar (Roll, Shells, Vault Coins) -->
       <div class="action-bar">
-        <div class="result-mini" id="p1-result-num">—</div>
-        
-        <!-- Animated Border Timer Wrapper -->
-        <div class="roll-btn-wrap">
-          <div class="timer-border red-fill" id="p1-timer-border"></div>
+        <div class="roll-btn-wrap" id="p1-timer-wrap">
+          <div class="timer-bg" id="p1-timer-fill" style="--timer-color: #ef4444;"></div>
           <button class="roll-btn-mini" id="p1-roll-btn" onclick="rollGavvalu(1)">🎲 గవ్వలు(5)</button>
         </div>
-        
         <div class="shells-row-mini">
           <div class="shell-el" id="p1-s0">🐚</div><div class="shell-el" id="p1-s1">🐚</div>
           <div class="shell-el" id="p1-s2">🐚</div><div class="shell-el" id="p1-s3">🐚</div>
@@ -350,7 +351,7 @@
         <div class="vault-tokens-inline" id="p1-vault-tokens"></div>
       </div>
 
-      <!-- Stats & Turn Info -->
+      <!-- 3. Stats & Turn Info -->
       <div class="stats-bar">
         <div class="turn-badge-mini"><div class="turn-dot red" id="p1-dot"></div><span class="turn-label red" id="p1-label">RED వంతు</span></div>
         <div class="stats-group">
@@ -359,10 +360,13 @@
         </div>
       </div>
 
-      <!-- Extra: Prediction (Hidden in Mobile) -->
-      <div class="extra-box">
-        <div class="col-header" onclick="togglePred()">📊 గెలుపు అంచనా (Prediction) <span id="pred-arrow">▼</span></div>
-        <div class="col-content" id="pred-body">
+      <!-- 4. Extra: Prediction & Quit (For Red Panel) -->
+      <div class="extra-box" id="red-extra-box">
+        <div class="col-header" style="display:flex; justify-content:space-between; align-items:center; padding-right:6px;">
+          <div onclick="togglePred()" style="flex:1;">📊 గెలుపు అంచనా <span id="pred-arrow">▼</span></div>
+          <button class="quit-mini-btn" onclick="showQuitModal(event)">✕ QUIT</button>
+        </div>
+        <div class="col-content" id="pred-body" style="display:none;">
           <div class="meter-track"><div class="meter-red" id="m-red" style="width:50%">50%</div><div class="meter-blue" id="m-blue" style="width:50%">50%</div></div>
         </div>
       </div>
@@ -373,18 +377,6 @@
 
   <!-- Event Banner Popup -->
   <div class="event-banner" id="ev-banner"><div id="ev-main"></div><div class="ev-sub" id="ev-sub"></div></div>
-
-  <!-- Quit Button & Modal -->
-  <button id="quit-btn" class="quit-btn" onclick="showQuitModal()" style="display:none;" title="Quit Game">✕</button>
-  <div id="quit-modal" class="modal-overlay" style="display:none;">
-    <div class="modal-box">
-      <p class="modal-text">ఆట నుండి బయటకు రావాలనుకుంటున్నారా?<br><span style="font-size:12px;color:var(--text-muted);font-weight:normal;">(Do you want to quit the game?)</span></p>
-      <div class="modal-btns">
-        <button class="modal-btn yes-btn" onclick="confirmQuit()">అవును (Yes)</button>
-        <button class="modal-btn no-btn" onclick="closeQuitModal()">వద్దు (No)</button>
-      </div>
-    </div>
-  </div>
 
   <!-- JAVASCRIPT (LOGIC) -->
   <script>
@@ -423,19 +415,6 @@
     function loadGameState() { const saved = localStorage.getItem('shellkoin_state_new'); if (saved) { try { G = { ...getInitialState(), ...JSON.parse(saved) }; return true; } catch(e) { return false; } } return false; }
     function clearGameState() { localStorage.removeItem('shellkoin_state_new'); }
 
-    function showQuitModal() { if(G.isGameOver) return; document.getElementById('quit-modal').style.display = 'flex'; }
-    function closeQuitModal() { document.getElementById('quit-modal').style.display = 'none'; }
-    function confirmQuit() {
-        closeQuitModal(); G.isGameOver = true; stopTimer(); clearGameState();
-        document.getElementById('main-game').style.display = 'none';
-        document.getElementById('quit-btn').style.display = 'none';
-        const startScreen = document.getElementById('start-screen');
-        startScreen.style.display = 'flex'; startScreen.style.opacity = '1';
-        document.getElementById('step-1').style.display = 'block';
-        document.getElementById('step-2').style.display = 'none';
-        removePortal(); removeRedhole();
-    }
-
     function updKeySel(){ curMovEls.forEach((e,i)=>e.classList.toggle('key-selected',i===selMovIdx)); }
     
     let predOpen = false;
@@ -443,12 +422,20 @@
     function togglePred() { predOpen = !predOpen; document.getElementById('pred-body').style.display = predOpen ? 'block' : 'none'; document.getElementById('pred-arrow').textContent = predOpen ? '▲' : '▼'; }
     function toggleHist() { histOpen = !histOpen; document.getElementById('hist-body').style.display = histOpen ? 'flex' : 'none'; document.getElementById('hist-arrow').textContent = histOpen ? '▲' : '▼'; }
 
+    function showQuitModal(e) { e.stopPropagation(); document.getElementById('quit-modal').style.display = 'flex'; stopTimer(); }
+    function closeQuitModal() { document.getElementById('quit-modal').style.display = 'none'; startTimer(); }
+    function confirmQuit() { document.getElementById('quit-modal').style.display = 'none'; restartGame(); }
+
     function restartGame() {
         G = getInitialState(); clearGameState();
         document.getElementById('restart-screen').style.display = 'none';
+        document.getElementById('main-game').style.display = 'none';
+        document.getElementById('start-screen').style.display = 'flex';
+        document.getElementById('start-screen').style.opacity = '1';
+        document.getElementById('step-1').style.display = 'block';
+        document.getElementById('step-2').style.display = 'none';
         document.getElementById('hist-body').innerHTML = '';
         removePortal(); removeRedhole(); updateStrikeDisplay(); resetRoll();
-        document.getElementById('quit-btn').style.display = 'flex';
     }
     
     function showRestartScreen(title, sub) {
@@ -483,25 +470,24 @@
       if (G.isGameOver) return;
       clearInterval(G.timerInterval); turnTimeLeft = 100;
       
-      const p1Border = document.getElementById('p1-timer-border'), p2Border = document.getElementById('p2-timer-border');
+      const p1Fill = document.getElementById('p1-timer-fill'), p2Fill = document.getElementById('p2-timer-fill');
+      const p1Wrap = document.getElementById('p1-timer-wrap'), p2Wrap = document.getElementById('p2-timer-wrap');
       
-      // Reset variables
-      p1Border.style.setProperty('--timer-deg', '0deg');
-      p2Border.style.setProperty('--timer-deg', '0deg');
-      p1Border.style.opacity = '0';
-      p2Border.style.opacity = '0';
-
-      const activeBorder = G.currentPlayer === 1 ? p1Border : p2Border;
-      activeBorder.style.opacity = '1';
-      activeBorder.style.setProperty('--timer-deg', '360deg');
-
+      p1Fill.style.setProperty('--timer-deg', '0deg'); p2Fill.style.setProperty('--timer-deg', '0deg');
+      p1Wrap.style.boxShadow = 'none'; p2Wrap.style.boxShadow = 'none';
+      
+      const activeFill = G.currentPlayer === 1 ? p1Fill : p2Fill;
+      const activeWrap = G.currentPlayer === 1 ? p1Wrap : p2Wrap;
+      const color = G.currentPlayer === 1 ? '#ef4444' : '#3b82f6';
+      
+      activeFill.style.setProperty('--timer-deg', '360deg');
+      activeWrap.style.boxShadow = `0 0 10px ${color}`;
+      
       G.timerInterval = setInterval(() => {
         if (G.isGameOver) { clearInterval(G.timerInterval); return; }
         turnTimeLeft -= 1; 
-        
-        // Calculate degrees for the animated conic gradient
-        const degrees = (turnTimeLeft / 100) * 360;
-        activeBorder.style.setProperty('--timer-deg', `${degrees}deg`);
+        const deg = (turnTimeLeft / 100) * 360;
+        activeFill.style.setProperty('--timer-deg', `${deg}deg`);
         
         if (turnTimeLeft <= 0) { clearInterval(G.timerInterval); handleTimeout(); }
       }, 100);
@@ -515,7 +501,6 @@
       updateStrikeDisplay();
       if (strikes >= 4) {
         G.isGameOver = true; stopTimer();
-        document.getElementById('quit-btn').style.display = 'none';
         document.getElementById('p1-roll-btn').disabled = true; document.getElementById('p2-roll-btn').disabled = true;
         const winner = p===1 ? '🔵 BLUE' : '🔴 RED';
         document.getElementById('p1-label').textContent = `${p===1?'BLUE':'RED'} విజేత! 👑`; document.getElementById('p2-label').textContent = `${p===1?'BLUE':'RED'} విజేత! 👑`;
@@ -581,7 +566,6 @@
         const t1 = document.getElementById('p1-tip'); 
         const t2 = document.getElementById('p2-tip'); 
         
-        /* Laptop View: Show instruction only to active player, and 'Waiting' to the other */
         if (G.device === 'laptop' && activeP !== 0) {
             if (activeP === 1) {
                 t1.textContent = text; t1.className = cls;
@@ -621,7 +605,6 @@
       else if (p===2&&G.p2BonusPending) { if (p2sum<p1sum) final=boostedRoll(base); G.p2BonusPending=false; }
       G.extraTurn = (final===12); G.currentRoll = final; G.hasRolled = true; document.getElementById(`p${p}-result-num`).textContent = final;
       
-      // Update History Box
       const hb = document.getElementById('hist-body');
       if (hb) {
           const badge = document.createElement('div');
@@ -770,9 +753,9 @@
       if (G.p1Timeouts >= 4 || G.p2Timeouts >= 4) return;
       const p1win=G.p1Tokens.every(p=>p===p1Path.length-1), p2win=G.p2Tokens.every(p=>p===p2Path.length-1);
       if (!p1win&&!p2win) return;
-      G.isGameOver=true; stopTimer(); 
-      document.getElementById('quit-btn').style.display = 'none';
-      document.getElementById('p1-roll-btn').disabled=true; document.getElementById('p2-roll-btn').disabled=true;
+      G.isGameOver=true; stopTimer(); document.getElementById('p1-roll-btn').disabled=true; document.getElementById('p2-roll-btn').disabled=true;
+      const lbl = document.getElementById('p1-label'); const lbl2 = document.getElementById('p2-label');
+      lbl.textContent = `${p1win?'RED':'BLUE'} విజేత! 👑`; lbl2.textContent = lbl.textContent; lbl.style.color = '#fbbf24'; lbl2.style.color = '#fbbf24';
       SFX.play('win'); const winner=p1win?'🔴 RED':'🔵 BLUE';
       let p1Perm = hasPerm(1), p2Perm = hasPerm(2), winR = "అద్భుతం! అభినందనలు!";
       if (p1win && !p2Perm) winR = "BLUE కి లోపలికి వెళ్లే పర్మిషన్ లేదు కాబట్టి ఓటమి!"; if (p2win && !p1Perm) winR = "RED కి లోపలికి వెళ్లే పర్మిషన్ లేదు కాబట్టి ఓటమి!";
@@ -816,12 +799,11 @@
             setDualTip(tipText, '', p); 
         }
         document.getElementById('main-game').style.display = 'flex';
-        document.getElementById('quit-btn').style.display = 'flex';
         updateStrikeDisplay(); updateBoard(); startTimer();
     }
 
     document.addEventListener('keydown', e => {
-      if(G.isGameOver || document.getElementById('start-screen').style.display !== 'none') return;
+      if(G.isGameOver || document.getElementById('start-screen').style.display !== 'none' || document.getElementById('quit-modal').style.display === 'flex') return;
       if(e.key === '5') { e.preventDefault(); if(!G.hasRolled) { if(G.currentPlayer === 1 && !document.getElementById('p1-roll-btn').disabled) rollGavvalu(1); else if(G.currentPlayer === 2 && !document.getElementById('p2-roll-btn').disabled) rollGavvalu(2); } }
       else if(e.key === '0') { e.preventDefault(); if(G.hasRolled && selMovIdx > -1 && curMovEls[selMovIdx]) curMovEls[selMovIdx].click(); }
       else if(G.hasRolled && curMovEls.length > 1) {
@@ -856,7 +838,6 @@
         setTimeout(() => { 
             startScreen.style.display = 'none';
             document.getElementById('main-game').style.display = 'flex';
-            document.getElementById('quit-btn').style.display = 'flex';
             updateStrikeDisplay(); 
             resetRoll(); 
         }, 500);
