@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>ShellKoin 7x7</title>
   <style>
-    /* ===== COLORS & THEME ===== */ 
+    /* ===== COLORS & THEME ===== */
     :root {
       --board-bg: #6b3a1f; --board-border: #3d1f08; --cell-white: #fdf8f0; --cell-yellow: #fef3c7;
       --cell-orange: #fed7aa; --cell-safe: #bbf7d0; --cell-center: #fbbf24; --red: #ef4444;
@@ -184,6 +184,18 @@
     .confetti-piece { position: fixed; top: -12px; width: 8px; height: 10px; z-index: 999; animation: fall linear forwards; border-radius: 2px; }
     @keyframes fall { to { transform: translateY(110vh) rotate(720deg); } }
 
+    /* ===== QUIT BUTTON & MODAL ===== */
+    .quit-btn { position: fixed; top: 50%; right: 4px; transform: translateY(-50%); width: 34px; height: 34px; border-radius: 50%; background: rgba(45,26,10,0.8); border: 2px solid #ef4444; color: #ef4444; font-size: 16px; font-weight: 900; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 999; box-shadow: 0 0 10px rgba(239,68,68,0.4); outline: none; transition: transform 0.2s; backdrop-filter: blur(2px); }
+    .quit-btn:hover { transform: translateY(-50%) scale(1.1); background: #ef4444; color: #fff; }
+    
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 3000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(3px); }
+    .modal-box { background: var(--panel-card); border: 2px solid var(--board-border); border-radius: 16px; padding: 24px; text-align: center; max-width: 300px; box-shadow: 0 0 40px rgba(0,0,0,0.8); }
+    .modal-text { font-size: 16px; color: var(--text-light); margin-bottom: 20px; font-weight: bold; line-height: 1.4; }
+    .modal-btns { display: flex; gap: 12px; justify-content: center; }
+    .modal-btn { padding: 10px 20px; font-size: 14px; font-weight: 700; border-radius: 8px; cursor: pointer; outline: none; border: none; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+    .yes-btn { background: linear-gradient(135deg, #ef4444, #b91c1c); color: white; }
+    .no-btn { background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: white; }
+
     /* ===== LAPTOP / DESKTOP VIEW (ONLY DESIGN CHANGES) ===== */
     @media (min-width: 801px) {
       body { padding: 3vh 2vw; }
@@ -219,14 +231,14 @@
       
       /* Big Results */
       .result-mini { font-size: 4rem; min-width: auto; margin-bottom: 10px; }
-      .tip-text { font-size: 1.05rem; white-space: normal; line-height: 1.5; text-align: center; }
-      
-      /* Stats Alignment */
-      .stats-bar { flex-direction: column; gap: 1.5vh; font-size: 1.05rem; padding: 2vh; align-items: center; background: rgba(255,255,255,0.02); border-radius: 12px; }
-      .turn-badge-mini { font-size: 1.3rem; }
-      .turn-dot { width: 12px; height: 12px; }
-      
+      /* Force display Prediction and History on Laptop */
+      .extra-box { margin-top: auto; }
+      #pred-body { display: block !important; }
+      #hist-body { display: flex !important; }
       #pred-arrow, #hist-arrow { display: none; }
+      
+      .quit-btn { top: 20px; right: 20px; transform: none; width: 44px; height: 44px; font-size: 20px; }
+      .quit-btn:hover { transform: scale(1.1); }
     }
   </style>
 </head>
@@ -362,6 +374,18 @@
   <!-- Event Banner Popup -->
   <div class="event-banner" id="ev-banner"><div id="ev-main"></div><div class="ev-sub" id="ev-sub"></div></div>
 
+  <!-- Quit Button & Modal -->
+  <button id="quit-btn" class="quit-btn" onclick="showQuitModal()" style="display:none;" title="Quit Game">✕</button>
+  <div id="quit-modal" class="modal-overlay" style="display:none;">
+    <div class="modal-box">
+      <p class="modal-text">ఆట నుండి బయటకు రావాలనుకుంటున్నారా?<br><span style="font-size:12px;color:var(--text-muted);font-weight:normal;">(Do you want to quit the game?)</span></p>
+      <div class="modal-btns">
+        <button class="modal-btn yes-btn" onclick="confirmQuit()">అవును (Yes)</button>
+        <button class="modal-btn no-btn" onclick="closeQuitModal()">వద్దు (No)</button>
+      </div>
+    </div>
+  </div>
+
   <!-- JAVASCRIPT (LOGIC) -->
   <script>
     const SFX = {
@@ -399,6 +423,19 @@
     function loadGameState() { const saved = localStorage.getItem('shellkoin_state_new'); if (saved) { try { G = { ...getInitialState(), ...JSON.parse(saved) }; return true; } catch(e) { return false; } } return false; }
     function clearGameState() { localStorage.removeItem('shellkoin_state_new'); }
 
+    function showQuitModal() { if(G.isGameOver) return; document.getElementById('quit-modal').style.display = 'flex'; }
+    function closeQuitModal() { document.getElementById('quit-modal').style.display = 'none'; }
+    function confirmQuit() {
+        closeQuitModal(); G.isGameOver = true; stopTimer(); clearGameState();
+        document.getElementById('main-game').style.display = 'none';
+        document.getElementById('quit-btn').style.display = 'none';
+        const startScreen = document.getElementById('start-screen');
+        startScreen.style.display = 'flex'; startScreen.style.opacity = '1';
+        document.getElementById('step-1').style.display = 'block';
+        document.getElementById('step-2').style.display = 'none';
+        removePortal(); removeRedhole();
+    }
+
     function updKeySel(){ curMovEls.forEach((e,i)=>e.classList.toggle('key-selected',i===selMovIdx)); }
     
     let predOpen = false;
@@ -411,6 +448,7 @@
         document.getElementById('restart-screen').style.display = 'none';
         document.getElementById('hist-body').innerHTML = '';
         removePortal(); removeRedhole(); updateStrikeDisplay(); resetRoll();
+        document.getElementById('quit-btn').style.display = 'flex';
     }
     
     function showRestartScreen(title, sub) {
@@ -477,6 +515,7 @@
       updateStrikeDisplay();
       if (strikes >= 4) {
         G.isGameOver = true; stopTimer();
+        document.getElementById('quit-btn').style.display = 'none';
         document.getElementById('p1-roll-btn').disabled = true; document.getElementById('p2-roll-btn').disabled = true;
         const winner = p===1 ? '🔵 BLUE' : '🔴 RED';
         document.getElementById('p1-label').textContent = `${p===1?'BLUE':'RED'} విజేత! 👑`; document.getElementById('p2-label').textContent = `${p===1?'BLUE':'RED'} విజేత! 👑`;
@@ -731,9 +770,9 @@
       if (G.p1Timeouts >= 4 || G.p2Timeouts >= 4) return;
       const p1win=G.p1Tokens.every(p=>p===p1Path.length-1), p2win=G.p2Tokens.every(p=>p===p2Path.length-1);
       if (!p1win&&!p2win) return;
-      G.isGameOver=true; stopTimer(); document.getElementById('p1-roll-btn').disabled=true; document.getElementById('p2-roll-btn').disabled=true;
-      const lbl = document.getElementById('p1-label'); const lbl2 = document.getElementById('p2-label');
-      lbl.textContent = `${p1win?'RED':'BLUE'} విజేత! 👑`; lbl2.textContent = lbl.textContent; lbl.style.color = '#fbbf24'; lbl2.style.color = '#fbbf24';
+      G.isGameOver=true; stopTimer(); 
+      document.getElementById('quit-btn').style.display = 'none';
+      document.getElementById('p1-roll-btn').disabled=true; document.getElementById('p2-roll-btn').disabled=true;
       SFX.play('win'); const winner=p1win?'🔴 RED':'🔵 BLUE';
       let p1Perm = hasPerm(1), p2Perm = hasPerm(2), winR = "అద్భుతం! అభినందనలు!";
       if (p1win && !p2Perm) winR = "BLUE కి లోపలికి వెళ్లే పర్మిషన్ లేదు కాబట్టి ఓటమి!"; if (p2win && !p1Perm) winR = "RED కి లోపలికి వెళ్లే పర్మిషన్ లేదు కాబట్టి ఓటమి!";
@@ -777,6 +816,7 @@
             setDualTip(tipText, '', p); 
         }
         document.getElementById('main-game').style.display = 'flex';
+        document.getElementById('quit-btn').style.display = 'flex';
         updateStrikeDisplay(); updateBoard(); startTimer();
     }
 
@@ -816,6 +856,7 @@
         setTimeout(() => { 
             startScreen.style.display = 'none';
             document.getElementById('main-game').style.display = 'flex';
+            document.getElementById('quit-btn').style.display = 'flex';
             updateStrikeDisplay(); 
             resetRoll(); 
         }, 500);
